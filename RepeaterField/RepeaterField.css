@@ -1,0 +1,28 @@
+.repeaterField {
+
+}
+    .repeaterField-label {
+        margin-bottom: .5rem;
+    }
+    .repeaterField .field {
+        margin-bottom: .5rem;
+    }
+    .repeaterField-template {
+        display: none;
+    }
+    .repeaterField-items {
+        width: 100%;
+    }
+    .repeaterField-item {
+        position: relative;
+    }
+    .repeaterField-field {
+        margin-right: 40px;
+    }
+    .repeaterField-remove {
+        position: absolute;
+        top: 50%; right:0;
+        text-align: right;
+        padding-bottom: .5rem;
+        transform: translateY(-50%);
+    }
