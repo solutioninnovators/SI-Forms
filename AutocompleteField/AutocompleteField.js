@@ -29,18 +29,13 @@ $(function() {
            },
        });
 
-       // If the user manually types in a value, copy the value to the hidden field so that we can check it when saving the page
-       $this.on('keyup', debounce(function(e) {
-            var isWordCharacter = e.key.length === 1;
-            var isBackspaceOrDelete = (e.keyCode == 8 || e.keyCode == 46);
-
-            if (isWordCharacter || isBackspaceOrDelete) {
+       // If the user manually types or pastes in a value, copy the value to the hidden field so that we can check it when saving the page
+       $this.on('input', debounce(function(e) {
                 $realField.val($this.val());
                 if($this.val() != previousValue) {
                     $realField.trigger('change');
                 }
                 previousValue = $this.val();
-            }
        }, 500));
    });
 });
