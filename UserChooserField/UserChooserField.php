@@ -28,6 +28,7 @@
 		</ul>
 
 	<?php else: ?>
+		<input type="hidden" class="field-fallback" name="<?= $name ?>" value="[#]" />
 	
 		<ul class="userChooser <?= $singular ? 'userChooser_singular' : '' ?> group">
 			<?php foreach($options as $option): ?>
@@ -42,6 +43,10 @@
 			<?php endforeach ?>
 		</ul>
 
+	<?php endif ?>
+
+	<?php if($notes): ?>
+		<div class="field-notes"><?= $notes ?></div>
 	<?php endif ?>
 
 	<?php if($error): ?>

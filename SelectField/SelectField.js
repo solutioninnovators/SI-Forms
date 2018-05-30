@@ -1,5 +1,5 @@
 /**
- * @todo: prevent chosen call if not using autocomplete. Actually, don't load this file at all in that case.
+ * @todo: prevent chosen call if not using autocomplete.
  */
 $(function() {
     function init() {
@@ -11,7 +11,7 @@ $(function() {
     init();
 
     // re-initialize on reload
-	$('body').on('reloaded', '.ui_SelectField', function(e) {
+	$('body').on('reloaded', '*', function(e) {
 		init();
 	});
 });

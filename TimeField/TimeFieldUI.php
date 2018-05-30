@@ -4,6 +4,10 @@ class TimeFieldUI extends FieldUI {
 	public $twentyFourHour = true; // Limits the field to a 24 hour period
 	public $amPm = false; // Uses 12 hour format with am & pm (requires $twentyFourHour == true)
 	public $hideIncrementButtons = false;
+	
+	protected function setup() {
+		$this->headScripts[] = "{$this->urls->templates}library/si-time.js";
+	}
 
 	protected function run() {
 		if($this->twentyFourHour == true) {

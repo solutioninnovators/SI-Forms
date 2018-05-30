@@ -1,21 +1,16 @@
-// @todo: Switch to using moment.js and moment-duration-format.js instead of custom time/duration conversion logic?
-
 $(function() {
     $('.timeField-up').on('click', function() {
         var $input = $(this).closest('.timeField').find('input');
         $input.val(incrementTime($input.val(), 1, $input));
-        $input.trigger('time-change');
     });
 
     $('.timeField-down').on('click', function() {
         var $input = $(this).closest('.timeField').find('input');
         $input.val(incrementTime($input.val(), -1, $input));
-        $input.trigger('time-change');
     });
 
     $('.timeField input').on('change', function() {
         $(this).val(incrementTime($(this).val(), 0, $(this) ));
-        $(this).trigger('time-change');
     });
 
     // Handle long mouse presses
@@ -56,6 +51,11 @@ $(function() {
                 }
             }
             else {
+                // If entered as a decimal, convert to HH:MM
+                if(time.split(".").length - 1 === 1) {
+                    time = minutesToTime(time * 60);
+                }
+
                 regex = new RegExp(/^\d+(:\d{2})?$/);
             }
 
@@ -66,45 +66,13 @@ $(function() {
             }
             $input.removeClass('txtBox_error');
 
-
-            // Parse and increment/decrement the time
-            var timeArray;
-            var hours;
-            var minutes;
-            var amPmLabel = '';
-
             // If necessary, convert from am/pm to 24-hour time
             if(amPm) {
-                var lastTwoChars = time.toLowerCase().slice(-2); // Store am/pm value in amPm var
-                if(lastTwoChars == 'am' || lastTwoChars == 'pm') {
-                    amPmLabel = lastTwoChars;
-                    time = time.slice(0, -2); // Remove am/pm from time
-                }
-                else {
-                    amPmLabel = 'am'; // If no am/pm, assume am
-                }
-
-                timeArray = time.split(':');
-                hours = timeArray[0];
-                minutes = timeArray[1] | 0;
-
-                if(hours < 12 && amPmLabel == 'pm') { // If pm, add 12 hours to get 24 hour time
-                    hours = (+hours) + 12;
-                }
-                else if(hours == 12 && amPmLabel == 'am') { // Convert 12:00am to 0:00
-                    hours = 0;
-                }
-            }
-            else {
-                timeArray = time.split(':');
-                hours = timeArray[0];
-                minutes = timeArray[1] | 0;
+                time = amPmToMilitary(time);
             }
 
-
-            var totalMinutes = (+hours) * 60 + (+minutes);
-
-            totalMinutes = totalMinutes + increment;
+            var totalMinutes = timeToMinutes(time);
+            totalMinutes += increment; // Apply the time increment/decrement
 
             if (twentyFourHour) {
                 if (totalMinutes > 1439) totalMinutes = 0;
@@ -114,31 +82,16 @@ $(function() {
                 if (totalMinutes < 0) totalMinutes = 0;
             }
 
-            var totalHours = totalMinutes / 60;
-            timeArray = totalHours.toString().split('.');
-            hours = timeArray[0];
-            minutes = pad(totalMinutes - (hours * 60));
+            time = minutesToTime(totalMinutes);
 
             // Convert back to am/pm if necessary
             if(amPm) {
-                if(hours > 11) {
-                    amPmLabel = 'pm';
-                    if(hours > 12) {
-                        hours = hours - 12;
-                    }
-                }
-                else {
-                    amPmLabel = 'am';
-                    if(hours == 0) { // Convert 0:00 to 12:00am
-                        hours = 12;
-                    }
-                }
-
+               time = militaryToAmPm(time);
             }
-            time = hours + ':' + minutes + amPmLabel;
 
         }
 
+        $input.trigger('time-change');
         return time;
     }
 });

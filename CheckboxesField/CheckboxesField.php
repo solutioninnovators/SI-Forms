@@ -16,6 +16,8 @@
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>
 
+	<input type="hidden" class="field-fallback" name="<?= $name ?>" value="[#]" />
+
 	<ul class="checkboxesField-list <?= $columnize ? 'checkboxesField-columnize' : '' ?>">
 		<?php foreach($options as $option): ?>
 			<li class="<?= $columnize ? 'dontsplit' : '' ?>">

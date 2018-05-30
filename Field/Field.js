@@ -18,10 +18,12 @@ $(function() {
 
         $.ajax({
             type: 'post',
+            url: $ui.closest('.ui[data-ui-url]').attr('data-ui-url'), // Use url from the closest UI block with the data-ui-url attribute set, otherwise use current page url
             dataType: 'json',
-            data: {ui: $ui.attr('data-ui-id'), ajax: 'save', value: params.value},
+            data: {ui: $ui.attr('data-ui-path'), ajax: 'save', value: params.value},
             success: function(data) {
                 if(data.saved) {
+                    $ui.trigger('saved');
                     console.log('Save successful.');
 
                     $saveBadge.html($checkmark);
@@ -50,8 +52,8 @@ $(function() {
     /**
      * Rules to trigger a field save event
      */
-    $('body').on('change', '.textareaField .field-input, .textField .field-input', function() {
-        console.log('Field changed.');
+    $('body').on('change', '.selectField .field-input', function() {
+        //console.log('Field changed.');
 
         var $field = $(this).closest('.field');
         if(!$field.attr('data-ajax-save')) return;
@@ -59,8 +61,18 @@ $(function() {
         $field.trigger('save', [{value: $(this).val()}]);
     });
 
+    $('body').on('input', '.textareaField .field-input, .textField .field-input', debounce(function(e) {
+        //console.log('Field changed.');
+
+        var $field = $(this).closest('.field');
+        if(!$field.attr('data-ajax-save')) return;
+
+        $field.trigger('save', [{value: $(this).val()}]);
+    }, 1000));
+
+
     $('body').on('click', '.checkboxField .field-input', function() {
-        console.log('Field changed.');
+        //console.log('Field changed.');
 
         var $field = $(this).closest('.field');
         if(!$field.attr('data-ajax-save')) return;

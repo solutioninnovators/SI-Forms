@@ -5,7 +5,7 @@
 		<?php if($required): ?><span class="field-required">*</span><?php endif ?>
 	</label>
 
-	<div class="field-saveBadge"></div>
+	<div class="field-saveBadge saveBadge"></div>
 
 	<?php if($description): ?>
 		<p class="field-description"><?= $description ?></p>

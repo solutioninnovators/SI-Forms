@@ -12,6 +12,8 @@
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>
 
+	<input type="hidden" class="field-fallback" name="<?= $name ?>" value="#" />
+
 	<?php foreach($options as $option): ?>
 		<label class="radioField-option <?= isset($option['tooltip']) ? 'tooltip' : '' ?>" title="<?= isset($option['tooltip']) ? $option['tooltip'] : '' ?>">
 			<input type="radio" name="<?= $name ?>" value="<?= $option['value'] ?>" <?= $option['value'] == $value ? 'checked' : '' ?> />

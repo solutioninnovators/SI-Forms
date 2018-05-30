@@ -1,10 +1,12 @@
-<div class="field selectField">
+<div class="field selectField" <?= $ajaxSave ? 'data-ajax-save="1"' : '' ?>>
 
 	<label class="field-label" for="<?= $id ?>">
 		<?php if($icon): ?><i class="field-icon fa fa-<?= $icon ?>"></i><?php endif ?>
 		<?= $label ?>
 		<?php if($required): ?><span class="field-required">*</span><?php endif ?>
 	</label>
+
+	<div class="field-saveBadge saveBadge"></div>
 
 	<?php if($description): ?>
 		<p class="field-description"><?= $description ?></p>

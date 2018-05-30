@@ -23,8 +23,8 @@
 			<input maxlength="<?= $maxLength ?>" size="<?= $maxLength ?>" name="<?= $name ?>" id="<?= $name ?>" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="text" placeholder="<?= $placeholder ?>" value="<?= $sanitizer->entities($value) ?>" data-twentyfourhour="<?= $twentyFourHour ?>" data-ampm="<?= $amPm ?>" <?= $disabled ? 'disabled' : '' ?> />
 
 			<?php if(!$hideIncrementButtons): ?>
-				<button type="button" class="timeField-down"><i class="fa fa-caret-down"></i></button>
-				<button type="button" class="timeField-up"><i class="fa fa-caret-up"></i></button>
+				<button type="button" class="timeField-down" tabindex="-1"><i class="fa fa-caret-down"></i></button>
+				<button type="button" class="timeField-up" tabindex="-1"><i class="fa fa-caret-up"></i></button>
 			<?php endif ?>
 		</div>
 	<?php endif ?>

@@ -3,7 +3,8 @@
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>
 
-	<input type="hidden" name="<?= $name ?>" value="0" <?= $disabled ? 'disabled' : '' ?> />
+	<input type="hidden" class="field-fallback" name="<?= $name ?>" value="0" <?= $disabled ? 'disabled' : '' ?> />
+
 	<label class="checkboxField-label"><input type="checkbox" name="<?= $name ?>" value="1" <?= $value == 1 ? 'checked="checked"' : '' ?> /> <?= $label ?></label>
 
 	<?php if($notes): ?>

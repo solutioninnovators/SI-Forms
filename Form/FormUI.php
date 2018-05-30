@@ -80,7 +80,7 @@ class FormUI extends UI {
 	public function validate($pullValuesFromInput = true) {
 		$valid = true;
 
-		// If using session storage and populateSessionValues() has not been called yet, do so now
+		// If using session storage and pullSessionValues() has not been called yet, do so now
 		if($this->sessionValuesPulled == false) $this->pullSessionValues();
 
 		if($this->method == 'get' || $this->disableCSRF || $this->session->CSRF->hasValidToken()) {
@@ -102,7 +102,17 @@ class FormUI extends UI {
 						$rawInputValue = isset($_POST[$field->name]) ? $_POST[$field->name] : null;
 					}
 
-					if($rawInputValue !== null) { // Only pull vars that actually exist in post or get (the field exists on the page)
+					if($rawInputValue !== null) { // Only pull vars that actually exist in post or get (the field existed on the page when it was submitted)
+
+						// Convert the strings '#' and '[#]' to empty string and empty array, respectively.
+						// These are the values provided by our hidden fallback/dummy fields for html inputs that do not submit values when they are present but empty. This allows us to differentiate between a field that was not submitted and one that was intentionally blank/empty
+						if($rawInputValue === '#') {
+							$rawInputValue = '';
+						}
+						elseif($rawInputValue === '[#]') {
+							$rawInputValue = [];
+						}
+
 						$field->value = $rawInputValue; // Set the field's value attribute to the value from post or get
 
 						if($this->sessionStorage) {

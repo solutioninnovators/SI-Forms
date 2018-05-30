@@ -9,7 +9,9 @@
 	<?php if($description): ?>
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>
-
+	
+	<input type="hidden" class="field-fallback" name="<?= $name ?>" value="#" />
+	
 	<?php foreach($options as $option): ?>
 		<input type="radio" name="<?= $name ?>" id="radioTab_<?= $option['value'] ?>" class="radioTab-input" value="<?= $option['value'] ?>" <?= $option['value'] == $value ? 'checked' : '' ?> /><label class="radioTab-label radioTab_<?= $option['value'] ?>-label tabs-tab tab <?= isset($option['tooltip']) ? 'tooltip' : '' ?>" title="<?= isset($option['tooltip']) ? $option['tooltip'] : '' ?>" for="radioTab_<?= $option['value'] ?>"><?= $option['label'] ?></label>&nbsp;
 	<?php endforeach ?>

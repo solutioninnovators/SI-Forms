@@ -8,6 +8,8 @@
 		</label>
 	<?php endif ?>
 
+	<div class="field-saveBadge saveBadge"></div>
+
 	<?php if($description): ?>
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>

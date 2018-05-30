@@ -5,7 +5,6 @@ class ButtonFieldUI extends FieldUI {
 	public $attributes = array(); // Any additional html attributes to include on the button
 	public $btnClasses = '';
 	public $fullWidth = true;
-	public $version = 2;
 
 	public function validate() {
 		return true;

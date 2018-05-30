@@ -12,7 +12,7 @@ $(function() {
            autoSelectFirst: true,
            preventBadQueries: false, // Having this enabled prevents the ID match from working correctly
            deferRequestBy: 250, // Number of milliseconds to defer Ajax request
-           params: { ajax: 'getMatches', ui: $this.closest('.ui').attr('data-ui-id') },
+           params: { ajax: 'getMatches', ui: $this.closest('.ui').attr('data-ui-path') },
            onSelect: function(suggestion) {
                $realField.val(suggestion.data); // Copy the selection to the real field
 
@@ -31,11 +31,11 @@ $(function() {
 
        // If the user manually types or pastes in a value, copy the value to the hidden field so that we can check it when saving the page
        $this.on('input', debounce(function(e) {
-                $realField.val($this.val());
-                if($this.val() != previousValue) {
-                    $realField.trigger('change');
-                }
-                previousValue = $this.val();
+            $realField.val($this.val());
+            if($this.val() != previousValue) {
+                $realField.trigger('change');
+            }
+            previousValue = $this.val();
        }, 500));
    });
 });
