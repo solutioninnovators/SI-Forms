@@ -7,12 +7,7 @@ class DateFieldUI extends FieldUI {
 		$this->headScripts[] = $this->config->urls->templates . "library/pikaday/pikaday.min.js";
 	}
 
-	public function validate() {
-		if($this->value == '') {
-			if($this->required == false) return true;
-			else $this->error = 'Required.';
-		}
-
+	protected function fieldValidate() {
 		if((int)$this->maxLength > 0) {
 			if(strlen($this->value) > (int)$this->maxLength) {
 				$this->error = 'Max length exceeded.';

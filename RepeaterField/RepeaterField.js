@@ -18,6 +18,11 @@ $(function() {
         e.preventDefault();
         var $repeater = $(this).closest('.repeaterField');
 
+        var itemLimit = $repeater.find('.repeaterField-items').attr('data-item-limit');
+        var itemCount = $repeater.find('.repeaterField-field').length;
+        if(itemCount >= itemLimit)
+            $repeater.find('.repeaterField-addNew').hide();
+
         // Get a copy of the hidden template element
         var $newItem = $repeater.find('.repeaterField-template').clone();
         $newItem.find('.field-input').removeAttr('disabled');
@@ -26,11 +31,17 @@ $(function() {
         $newItem.slideDown(100);
 
         updateIndexes($repeater)
+
     });
 
     $('body').on('click', '.repeaterField-remove', function(e) {
         e.preventDefault();
         var $repeater = $(this).closest('.repeaterField');
+
+        var itemLimit = $repeater.find('.repeaterField-items').attr('data-item-limit');
+        var itemCount = $repeater.find('.repeaterField-field').length - 1;
+        if(itemCount <= itemLimit)
+            $repeater.find('.repeaterField-addNew').show();
 
         var $item = $(this).closest('.repeaterField-item');
         $item.slideUp(100);

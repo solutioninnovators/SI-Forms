@@ -16,11 +16,7 @@ class TimeFieldUI extends FieldUI {
 		}
 	}
 
-	public function validate() {
-		if($this->value == '') {
-			if($this->required == false) return true;
-			else $this->error = 'Required.';
-		}
+	public function fieldValidate() {
 
 		if((int)$this->maxLength > 0) {
 			if(strlen($this->value) > (int)$this->maxLength) {

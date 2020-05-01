@@ -5,13 +5,17 @@
  * @package ProcessWire
  * 
  * Takes any other FieldUI and makes it repeatable. The values returned from the individual fields are stored as a multidimensional array
+ *
+ * @todo: Fields inside the repeater are not currently compatible with ajaxValidate or ajaxSave. If we want this to be possible, we need to ajax post the entire form along with the validate request (i.e. move field->ajax_validate to form->ajax_validate_field). This might also allow us to more easily implement field dependencies.
  */
 class RepeaterFieldUI extends FieldUI {
-	public $itemTemplate; // The field object of type FieldUI to repeat. This should not have a value. Name is optional and will only be used for multiple templates.
+	public $itemTemplate; // The field object or array of field objects of type FieldUI to repeat. This should not have a value. Name is optional and will only be used for multiple templates.
 	public $value = [];
 	public $showBlankItem = true; // Show a new item right away without having to click the "add" button
+    public $itemLimit;  // The number of items allowed to be added
+	public $cssClass = 'repeaterField';
 
-	private $children; // The items (rows) in the repeater
+	public $children; // The items (rows) in the repeater
 	private $initialValue; // Value set when object was first constructed
 	
 	protected function setup() {
@@ -30,23 +34,23 @@ class RepeaterFieldUI extends FieldUI {
 			if(empty($repeaterItemValue)) continue;
 
 			if(is_array($this->itemTemplate) && is_array($repeaterItemValue)) { // Array of item templates
-				$repeaterItemValue = array_values($repeaterItemValue); // Remove the keys so we can just access the values by index
 				
 				$subfieldIteration = 0;
 				foreach($this->itemTemplate as $subfieldTemplate) {
 					$subfield = clone $subfieldTemplate;
-					$subfield->name = $this->name . "[$repeaterItemIteration][$subfield->name]";
+					$subfieldName = $subfield->name;
 					$subfield->id = $this->id . $repeaterItemIteration . $subfield->id;
-					$subfield->value = $repeaterItemValue[$subfieldIteration];
-					$repeaterItems[$repeaterItemIteration][] = $subfield;
+					$subfield->name = $this->name . "[$repeaterItemIteration][$subfieldName]";
+					$subfield->value = $repeaterItemValue[$subfieldName];
+					$repeaterItems[$repeaterItemIteration][$subfieldName] = $subfield;
 
 					$subfieldIteration++;
 				}
 			}
 			else { // Single item template
-				$subfield = clone $this->itemTemplate;
-				$subfield->name = $this->name . "[$repeaterItemIteration]";
+                $subfield = clone $this->itemTemplate;
 				$subfield->id = $this->id . $repeaterItemIteration;
+				$subfield->name = $this->name . "[$repeaterItemIteration]";
 				$subfield->value = $repeaterItemValue;
 				$repeaterItems[] = $subfield;
 			}
@@ -60,34 +64,29 @@ class RepeaterFieldUI extends FieldUI {
 	 * @return bool
 	 * The calling form will have already set $this->value to the new value coming from post or get, so we just have to check the current value of $this->value
 	 */
-	public function validate() {
+	public function fieldValidate() {
 		$valid = true;
 
-		if($this->required && !count($this->value)) {
-			$valid = false;
-			$this->error = 'Required.';
+		// Reconstruct the fields array (repeater items) based on the new $this->value (if changed)
+		if($this->value !== $this->initialValue) {
+			$this->children = $this->constructRepeaterItems();
 		}
-		else {
-			// Reconstruct the fields array (repeater items) based on the new $this->value (if changed)
-			if($this->value !== $this->initialValue) {
-				$this->children = $this->constructRepeaterItems();
-			}
 
-			// Loop through each of the child fields and call its validate() function.
-			foreach($this->children as $child) {
-				if(is_array($child)) {
-					foreach($child as $subfield) {
-						if(!$subfield->validate()) $valid = false;
-					}
-				}
-				else {
-					if(!$child->validate()) $valid = false;
+		// Loop through each of the child fields and call its validate() function.
+		foreach($this->children as $child) {
+			if(is_array($child)) {
+				foreach($child as $subfield) {
+					if(!$subfield->validate()) $valid = false;
 				}
 			}
-
-			// We can set an error message for the whole repeater field if any of its subfields are invalid, or just let each subfield show its own error
-			//if(!$valid) $this->error = 'One or more of the values above is invalid.';
+			else {
+				if(!$child->validate()) $valid = false;
+			}
 		}
+
+		// We can set an error message for the whole repeater field if any of its subfields are invalid, or just let each subfield show its own error
+		//if(!$valid) $this->error = 'One or more of the values above is invalid.';
+
 
 		return $valid;
 	}
@@ -103,16 +102,18 @@ class RepeaterFieldUI extends FieldUI {
 			$repeaterRow = '';
 			foreach($this->itemTemplate as $fieldTemplate) {
 				$newField = clone $fieldTemplate;
+                $newField->id = $this->id . '$' . $newField->name;
 				$newField->name = $this->name . "[$][$newField->name]";
 				$newField->disabled = true;
-				$repeaterRow .= $newField->output();
+				$repeaterRow .= $newField->render();
 			}
 			$repeaterItemsOut[] = $repeaterRow;
 		}
 		else {
 			$template = clone $this->itemTemplate;
+            $template->id = $this->id . '$';
 			$template->name = $this->name . '[$]';
-			$repeaterItemsOut[] = $template->output();
+			$repeaterItemsOut[] = $template->render();
 		}
 
 		// Render existing fields in $this->fields for the view
@@ -120,12 +121,12 @@ class RepeaterFieldUI extends FieldUI {
 			if(is_array($field)) {
 				$repeaterRow = '';
 				foreach($field as $subfield) {
-					$repeaterRow .= $subfield->output();
+					$repeaterRow .= $subfield->render();
 				}
 				$repeaterItemsOut[] = $repeaterRow;
 			}
 			else {
-				$repeaterItemsOut[] = $field->output();
+				$repeaterItemsOut[] = $field->render();
 			}
 		}
 
@@ -137,21 +138,37 @@ class RepeaterFieldUI extends FieldUI {
 				$repeaterRow = '';
 				foreach($this->itemTemplate as $fieldTemplate) {
 					$newField = clone $fieldTemplate;
+                    $newField->id = $this->id . $newItemIndex . $newField->id;
 					$newField->name = $this->name . "[$newItemIndex][$newField->name]";
 					$newField->classes = $newField->classes .= ' repeaterField-newItem';
-					$repeaterRow .= $newField->output();
+					$repeaterRow .= $newField->render();
 				}
 				$repeaterItemsOut[] = $repeaterRow;
 			}
 			else {
 				$newField = clone $this->itemTemplate;
+                $newField->id = $this->id . $newItemIndex;
 				$newField->name = $this->name . "[$newItemIndex]";
 				$newField->classes = $newField->classes .= ' repeaterField-newItem';
-				$repeaterItemsOut[] = $newField->output();
+				$repeaterItemsOut[] = $newField->render();
 			}
 		}
 
 		$this->view->repeaterItemsOut = $repeaterItemsOut;
+	}
+
+	/**
+	 * A repeater is considered "populated" if at least one of its children is populated
+	 */
+	public function isPopulated() {
+
+		foreach($this->children as $child) {
+			if($child->isPopulated()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 }

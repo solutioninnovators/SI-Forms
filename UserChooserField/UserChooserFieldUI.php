@@ -20,7 +20,7 @@ class UserChooserFieldUI extends FieldUI {
 
 	}
 
-	public function validate() {
+	public function fieldValidate() {
 		if($this->required && !count($this->value)) {
 			$this->error = 'You must select a user.';
 		}

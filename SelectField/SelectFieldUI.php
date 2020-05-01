@@ -11,15 +11,7 @@ class SelectFieldUI extends FieldUI {
 		}
 	}
 
-	public function validate() {
-		if($this->value == '') {
-			if($this->required == false) return true;
-			else {
-				$this->error = 'You must select an option.';
-				return false;
-			}
-		}
-
+	public function fieldValidate() {
 		$optionMatch = false;
 		foreach($this->options as $option) {
 			if($option['value'] == $this->value) {

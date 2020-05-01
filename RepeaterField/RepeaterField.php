@@ -1,4 +1,4 @@
-<div class="repeaterField field">
+<?php include('../Field/header.php') ?>
 
 	<label class="repeaterField-label field-label">
 		<i class="field-icon fa fa-<?= $icon ?>"></i> <?= $label ?>
@@ -9,7 +9,7 @@
 		<p class="field-description"><?= $description ?></p>
 	<?php endif ?>
 
-	<ul class="repeaterField-items">
+	<ul class="repeaterField-items" data-item-limit="<?= isset($itemLimit)? $itemLimit : -1 ?>">
 		<?php $i = 0 ?>
 		<?php foreach($repeaterItemsOut as $repeaterItem): ?>
 			<li class="repeaterField-item <?= $i == 0 ? 'repeaterField-template' : '' ?>">
@@ -17,25 +17,17 @@
 					<?= $repeaterItem ?>
 				</div>
 				<?php if(!$readOnly): ?>
-					<div class="repeaterField-remove">
-						<button type="button" class="btn btn_sm"><i class="fa fa-trash"></i></button>
-					</div>
-				<?php endif ?>
+
+				<?php endif ?><div class="repeaterField-remove">
+                    <button type="button" class="btn btn_sm"><i class="fa fa-trash"></i></button>
+                </div>
 			</li>
 			<?php $i++ ?>
 		<?php endforeach ?>
 	</ul>
 
 	<?php if(!$readOnly): ?>
-		<button type="button" class="repeaterField-addNew btn btn_sm"><i class="fa fa-fw fa-plus"></i> Add New</button>
+		<button type="button" class="repeaterField-addNew btn btn_sm <?= (!isset($itemLimit) || $itemLimit == 1) ? 'hide':'' ?>" ><i class="fa fa-fw fa-plus"></i> Add New</button>
 	<?php endif ?>
 
-	<?php if($notes): ?>
-		<p class="field-notes"><?= $notes ?></p>
-	<?php endif ?>
-
-	<?php if($error): ?>
-		<span class="field-error"><i class="fa fa-caret-up"></i> <?= $error ?></span>
-	<?php endif ?>
-
-</div>
+<?php include('../Field/footer.php') ?>

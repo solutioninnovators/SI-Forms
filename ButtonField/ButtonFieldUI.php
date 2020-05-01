@@ -4,11 +4,7 @@ class ButtonFieldUI extends FieldUI {
 	public $type = 'submit'; // e.g. button, reset, or submit (use 'button' for js-only buttons)
 	public $attributes = array(); // Any additional html attributes to include on the button
 	public $btnClasses = '';
-	public $fullWidth = true;
-
-	public function validate() {
-		return true;
-	}
+	public $fullWidth = false;
 
 	public function run() {
 		// Convert attributes array into a string for output

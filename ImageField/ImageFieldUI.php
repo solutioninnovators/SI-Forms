@@ -20,9 +20,10 @@ class ImageFieldUI extends FieldUI {
 	public $savePage = null;
 	public $saveField = null;
 	
-	public function validate() {
+	public function fieldValidate() {
 		$value = $this->value;
 
+		//@todo: move to proper place
 		if(!$value['tmp_name']) {
 			if(!$this->required) {
 				return true;

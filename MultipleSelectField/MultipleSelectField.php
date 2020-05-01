@@ -1,4 +1,4 @@
-<div class="field multipleSelectField" <?php foreach($extraAttributes as $attr => $val): ?><?= $sanitizer->entities($attr) ?>="<?= $sanitizer->entities($val) ?>" <? endforeach?>>
+<div class="field multipleSelectField" <?php foreach($extraAttributes as $attr => $val): ?><?= $sanitizer->entities($attr) ?>="<?= $sanitizer->entities($val) ?>" <?php endforeach?>>
 
 	<label class="field-label">
 		<?php if($icon): ?><i class="field-icon fa fa-<?= $icon ?>"></i><?php endif ?>

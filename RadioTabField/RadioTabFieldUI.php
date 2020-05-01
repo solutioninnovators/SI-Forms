@@ -5,7 +5,7 @@ class RadioTabFieldUI extends FieldUI {
 
 	protected function setup() {}
 
-	public function validate() {
+	public function fieldValidate() {
 		$match = false;
 		foreach($this->options as $option) {
 			if($option['value'] == $this->value) {

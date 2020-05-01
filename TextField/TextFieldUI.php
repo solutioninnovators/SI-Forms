@@ -2,16 +2,16 @@
 class TextFieldUI extends FieldUI {
 	public $type = 'text'; // Options include text, email, password
 	public $attributes = array(); // Any additional html attributes
-	public $maxLength = 100;
-	
-	public function validate() {
+	public $maxLength = 255;
+	public $cssClass = 'textField';
+	public $honeypot = false; // Is this a honeypot field?
 
-		$this->value = trim($this->value);
+	public function filter() {
+		$this->value = $this->sanitizer->text($this->value, array('maxLength' => 0));
+	}
 
-		if($this->value == '') {
-			if($this->required == false) return true;
-			else $this->error = 'Required.';
-		}
+	public function fieldValidate() {
+		if($this->honeypot && $this->value) $this->session->redirect('./');
 
 		if((int)$this->minLength > 0) {
 			if(strlen($this->value) < (int)$this->minLength) {
@@ -25,12 +25,9 @@ class TextFieldUI extends FieldUI {
 			}
 		}
 
-		// Filter text w/ ProcessWire's sanitizer
-		$this->value = $this->sanitizer->text($this->value, array('stripTags' => false, 'maxLength' => $this->maxLength));
-
-		if($this->type == 'email') {
+		if($this->type === 'email') {
 			if(!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
-				$this->error = 'Invalid email address.';
+				$this->error = 'Incomplete email address.';
 			}
 		}
 

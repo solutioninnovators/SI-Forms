@@ -1,6 +1,53 @@
 .checkboxField {
     padding-top: 1.5rem;
 }
-    .checkboxField-label {
-        font-size: .85em;
+
+/* Toggle Switch checkbox replacement */
+.toggleSwitch {
+}
+    .toggleSwitch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        float: left;
+    }
+    .toggleSwitch-slider {
+        float: right;
+        position: relative;
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        background-color: #777;
+        -webkit-transition: .4s;
+        transition: .4s;
+        width: 60px;
+        height: 34px;
+        border-radius: 34px;
+        margin: 0 0 1rem 1rem;
+        vertical-align: middle;
+    }
+    .toggleSwitch-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .3s;
+        transition: .3s;
+        border-radius: 34px;
+    }
+    .toggleSwitch:active .toggleSwitch-slider:before {
+        width: 34px;
+    }
+    .toggleSwitch input:checked + .toggleSwitch-slider {
+        background-color: #2196F3;
+    }
+    .toggleSwitch input:focus + .toggleSwitch-slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+    .toggleSwitch input:checked + .toggleSwitch-slider:before {
+        left: calc(100% - 4px);
+        transform: translateX(-100%);
     }

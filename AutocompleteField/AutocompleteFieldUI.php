@@ -52,7 +52,7 @@ class AutocompleteFieldUI extends FieldUI {
 		return "id=" . (int)$this->value . ',' . $validateSelector;
 	}
 
-	public function validate() {
+	protected function fieldValidate() {
 		if($this->value == '') {
 			if($this->required == false) return true;
 			else $this->error = 'Required.';
