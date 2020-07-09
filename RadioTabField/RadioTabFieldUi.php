@@ -1,6 +1,6 @@
 <?php namespace ProcessWire;
 class RadioTabFieldUi extends FieldUi {
-	public $options = array(); // Each option expects a label and a value
+	public $options = []; // Each option expects a label and a value. NOTE: labels allow HTML content, so any user input must be escaped
 	public $value = '';
 
 	public function run() {

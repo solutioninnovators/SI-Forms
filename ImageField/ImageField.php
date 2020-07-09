@@ -5,7 +5,7 @@
 	<?php endif ?>
 
 	<div class="field-input imageField-input">
-		<input class="<?= $buttonClasses ?>" type="file" name="<?= $name ?>"  />
+		<input class="<?= $sanitizer->entities1($buttonClasses) ?>" type="file" name="<?= $sanitizer->entities1($name) ?>" id="input_<?= $sanitizer->entities1($id) ?>" />
 	</div>
 
 <?php include('../Field/footer.php') ?>

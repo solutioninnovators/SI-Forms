@@ -3,13 +3,13 @@
 <?php if($readOnly): ?>
 	<div class="field-readOnly">
 		<?php if($value): ?>
-			<?= $sanitizer->entities($value) ?>
+			<?= $sanitizer->entities1($value) ?>
 		<?php else: ?>
 			<div class="field-noValue"><i class="fa fa-minus-circle"></i> No Value</div>
 		<?php endif ?>
 	</div>
 <?php else: ?>
-	<input maxlength="<?= $maxLength ?>" name="<?= $name ?>" <?= $attributeString ?> id="<?= $id ?>" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="<?= $type ?>" placeholder="<?= $placeholder ?>" value="<?= $this->type !== 'password' ? $sanitizer->entities($value) : '' ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> <?= $autofocus ? 'autofocus="autofocus"' : '' ?> <?= !$autocomplete ? 'autocomplete="off"' : '' ?> />
+	<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?= $sanitizer->entities1($attributeString) ?> id="input_<?= $sanitizer->entities1($id) ?>" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="<?= $sanitizer->entities1($type) ?>" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $this->type !== 'password' ? $sanitizer->entities1($value) : '' ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> <?= $autofocus ? 'autofocus="autofocus"' : '' ?> <?= !$autocomplete ? 'autocomplete="off"' : '' ?> />
 <?php endif ?>
 
 <?php include('../Field/footer.php') ?>

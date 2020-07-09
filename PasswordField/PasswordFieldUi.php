@@ -1,6 +1,7 @@
 <?php namespace ProcessWire;
 class PasswordFieldUi extends FieldUi {
 
+    public $cssClass = 'passwordField';
     public $confirmPassword = false;
     public $visibilityToggle = true;
     public $testStrength = true;

@@ -86,7 +86,7 @@ $(function() {
         var saveBadgeTimeout = null;
         var timestamp = new Date().getTime();
         var value = params.value;
-        var fieldName = $field.attr('data-name');
+        var fieldName = $field.attr('data-field-name');
 
         // Set the time of this ajax call
         $field.attr('data-ajax-timestamp', timestamp);

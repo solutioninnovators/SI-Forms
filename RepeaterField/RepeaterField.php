@@ -1,6 +1,6 @@
 <?php include('../Field/header.php') ?>
 
-	<ul class="repeaterField-items" data-item-limit="<?= $itemLimit ?>">
+	<ul class="repeaterField-items" data-item-limit="<?= $sanitizer->entities1($itemLimit) ?>">
 		<?php $i = 0 ?>
 		<?php foreach($repeaterItemsOut as $repeaterItem): ?>
 			<li class="repeaterField-item <?= $i == 0 ? 'repeaterField-template' : '' ?>">
