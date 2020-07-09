@@ -1,0 +1,30 @@
+.checkboxesField {
+    position: relative;
+}
+    .checkboxesField-label {
+        font-size: .9rem;
+    }
+    .checkboxesField-bulkSelect {
+        font-size: .75em;
+        position: absolute;
+        top:0; right:0;
+    }
+    .checkboxesField button {
+        font-weight: bold;
+        border: 1px solid #e5e5e5;
+        padding: 4px 10px;
+    }
+        .checkboxesField button:hover, .checkboxesField button:focus {
+            background-color: #fcfcfc;
+        }
+    .checkboxesField-all {
+        border-radius: 4px 0 0 4px;
+    }
+    .checkboxesField-none {
+        border-radius: 0 4px 4px 0;
+        margin-left: -1px;
+    }
+    .checkboxesField-columnize {
+        column-width: 25rem;
+        column-gap: 1rem;
+    }

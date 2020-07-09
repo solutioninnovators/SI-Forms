@@ -1,0 +1,27 @@
+.numberField {
+    position: relative;
+}
+    .numberField-up, .numberField-down {
+        position: absolute;
+        top:0; right:0; bottom:0;
+        width: 2rem;
+        margin: 1px 0;
+        font-size: 20px;
+        color: #555;
+        border-left: 1px solid #ccc;
+    }
+    .numberField-up:hover, .numberField-down:hover {
+        background: #444;
+        color: #fff;
+    }
+    .numberField-outer {
+        position: relative;
+    }
+    .numberField-up {
+        padding-bottom: 4px;
+        margin-right: 1px;
+    }
+    .numberField-down {
+        right: 2rem;
+        padding-top: 4px;
+    }

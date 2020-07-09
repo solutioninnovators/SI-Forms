@@ -1,0 +1,36 @@
+.userChooser {}
+    .userChooser-item {
+        position: relative;
+        padding: 2px;
+        cursor: pointer;
+        opacity: .3;
+        transition: .3s opacity;
+        width: 75px;
+    }
+        .userChooser-item.userChooser-readOnly {
+            cursor: default;
+        }
+    .userChooser-checkbox {
+        visibility: hidden;
+        position: absolute;
+        width: 0;
+        height: 0;
+    }
+    .userChooser-item:hover {
+        opacity: 1;
+    }
+    .userChooser-item.userChooser-selected {
+        opacity: 1;
+    }
+    .userChooser-img {
+        border: 2px solid transparent;
+    }
+    .userChooser-selected:not(.userChooser-readOnly) .userChooser-img {
+        border: 2px solid #84D05E;
+    }
+    .userChooser-label {
+        position: absolute;
+        color: #fff;
+        right:6px; bottom:2px;
+        font-weight: bold;
+    }
