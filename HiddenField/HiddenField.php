@@ -1,1 +1,0 @@
-<input type="hidden" class="<?= $inputClasses ?>" name="<?= $name ?>" value="<?= $sanitizer->entities($value) ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> />

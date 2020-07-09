@@ -1,3 +1,0 @@
-$(function() {
-    $('.multipleSelectField-select').multipleSelect();
-});
