@@ -22,6 +22,6 @@
     .repeaterField-remove {
         position: absolute;
         top: 50%;
-        right: .75rem;
+        right: 0;
         transform: translateY(-50%);
     }
