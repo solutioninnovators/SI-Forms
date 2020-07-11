@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 class MultipleSelectFieldUi extends FieldUi {
-	public $options = []; // Each option expects a label and a value
 	public $value = [];
+	public $__options = []; // Each option expects a label and a value
 	public $cssClass = 'multipleSelectField';
 
 	protected function setup() {

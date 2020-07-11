@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 class SelectFieldUi extends FieldUi {
 
-	public $options = array(); // Each option expects a label and a value
+	public $__options = []; // Each option expects a label and a value
 	public $autocomplete = false; // Progressively enhances the search field with autocomplete search
 	
 	protected function setup() {
@@ -34,5 +34,7 @@ class SelectFieldUi extends FieldUi {
 			}
 		}
 		$this->view->selectedLabel = $selectedLabel;
+		
+		return parent::run();
 	}
 }

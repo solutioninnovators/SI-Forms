@@ -3,7 +3,7 @@
 class ButtonFieldUi extends FieldUi {
 	public $href = ''; // Specifying an href will cause the button to be created as an <a> link rather than html <button>
 	public $type = 'submit'; // e.g. button, reset, or submit (use 'button' for js-only buttons)
-	public $attributes = array(); // Any additional html attributes to include on the button
+	public $attributes = []; // Any additional html attributes to include on the button
 	public $btnClasses = '';
 	public $fullWidth = false;
 
@@ -14,5 +14,7 @@ class ButtonFieldUi extends FieldUi {
 			$attributeString .= "$attrKey=\"$attrValue\" ";
 		}
 		$this->view->attributeString = $attributeString;
+		
+		return parent::run();
 	}
 }

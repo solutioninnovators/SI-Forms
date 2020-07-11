@@ -8,6 +8,7 @@ $(function() {
 				if($this.attr("name")) {
 					var newName = $this.attr("name").replace(/\[(\d+|\$)\]/, '[' + i + ']');
 					$this.attr('name', newName);
+                    $this.closest('.field').attr('data-field-name', newName);
 				}
 			});
 			i++;

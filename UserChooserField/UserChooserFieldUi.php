@@ -10,15 +10,9 @@
  */
 class UserChooserFieldUi extends FieldUi {
 
-	public $options; // PageArray
-	public $value = array();
+	public $__options; // PageArray
+	public $value = [];
 	public $singular = false; // Only allows selection of a single user
-
-	protected function setup() {}
-
-	protected function run() {
-
-	}
 
 	public function fieldValidate() {
 		if($this->required && !count($this->value)) {

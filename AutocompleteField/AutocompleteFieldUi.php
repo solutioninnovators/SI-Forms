@@ -36,6 +36,8 @@ class AutocompleteFieldUi extends FieldUi {
 				$this->view->displayValue = $this->createLabel($match);
 			}
 		}
+		
+		return parent::run();
 	}
 
 	private function buildSearchSelector($query) {

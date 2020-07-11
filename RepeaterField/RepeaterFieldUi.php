@@ -23,15 +23,12 @@ class RepeaterFieldUi extends FieldUi {
 	/**
 	 * Constructs the appropriate number of fields (repeater items) and updates their values based on the current $this->value array. Uses $this->fieldTemplate as the template for each repeater item.
 	 *
-	 * @todo: Process callback options on each repeater item?
 	 */
 	private function constructRepeaterItems() {
 		$repeaterItems = [];
 		$repeaterItemIteration = 0;
 
 		foreach($this->value as $repeaterItemValue) {
-			if(empty($repeaterItemValue)) continue;
-
 			if(is_array($this->itemTemplate) && is_array($repeaterItemValue)) { // Array of item templates
 				
 				$subfieldIteration = 0;
@@ -66,19 +63,14 @@ class RepeaterFieldUi extends FieldUi {
 	public function fieldValidate() {
 		$valid = true;
 
-		// Reconstruct the fields array (repeater items) based on the new $this->value (if changed)
-		/*if($this->value !== $this->initialValue) {
-			$this->children = $this->constructRepeaterItems();
-		}*/
-
 		if($this->itemLimit && $this->itemLimit < count($this->children)) {
 			$this->error = __('Max number of items is ') . $this->itemLimit;
 			$valid = false;
 		}
 
 		// Loop through each of the child fields and call its validate() function.
-		foreach($this->children as $child) { // Multiple fields per row
-			if(is_array($child)) {
+		foreach($this->children as $child) {
+			if(is_array($child)) { // Multiple fields per row
 				foreach($child as $subfield) {
 					if(!$subfield->validate()) $valid = false;
 				}
@@ -122,48 +114,57 @@ class RepeaterFieldUi extends FieldUi {
 			$template = clone $this->itemTemplate;
             $template->id = $this->id . '$';
 			$template->name = $this->name . '[$]';
+			$template->disabled = true;
 			$repeaterItemsOut[] = $template->render();
 		}
 
 		// Render existing fields in $this->fields for the view
 		foreach ($this->children as $field) {
-			if(is_array($field)) { // Multiple fields per row
-				$repeaterRow = '';
-				foreach($field as $subfield) {
-					$repeaterRow .= $subfield->render();
+			//if($field->isPopulated()) { // Filter out unpopulated fields
+				if (is_array($field)) { // Multiple fields per row
+					$repeaterRow = '';
+					foreach ($field as $subfield) {
+						$repeaterRow .= $subfield->render();
+					}
+					$repeaterItemsOut[] = $repeaterRow;
+				} else { // One field per row
+					$repeaterItemsOut[] = $field->render();
 				}
-				$repeaterItemsOut[] = $repeaterRow;
-			}
-			else { // One field per row
-				$repeaterItemsOut[] = $field->render();
-			}
+			//}
 		}
 
 		// Create an additional blank field for new input
-		if($this->showBlankItem || count($this->children) == 0) {
-			$newItemIndex = count($this->children);
+		$totalChildren = count($this->children);
+		if($this->showBlankItem || $totalChildren == 0) {
+			// Don't create an additional element if the last child already isn't populated
+			if($totalChildren < 1 || $this->children[$totalChildren - 1]->isPopulated()) {
 
-			if(is_array($this->itemTemplate)) { // Multiple fields per row
-				$repeaterRow = '';
-				foreach($this->itemTemplate as $fieldTemplate) {
-					$newField = clone $fieldTemplate;
-                    $newField->id = $this->id . $newItemIndex . $newField->id;
-					$newField->name = $this->name . "[$newItemIndex][$newField->name]";
-					$newField->classes = $newField->classes .= ' repeaterField-newItem';
-					$repeaterRow .= $newField->render();
+				$newItemIndex = $totalChildren;
+
+				if (is_array($this->itemTemplate)) { // Multiple fields per row
+					$repeaterRow = '';
+					foreach ($this->itemTemplate as $fieldTemplate) {
+						$newField = clone $fieldTemplate;
+						$newField->id = $this->id . $newItemIndex . $newField->id;
+						$newField->name = $this->name . "[$newItemIndex][$newField->name]";
+						$newField->classes = $newField->classes .= ' repeaterField-newItem';
+						$repeaterRow .= $newField->render();
+					}
+					$repeaterItemsOut[] = $repeaterRow;
 				}
-				$repeaterItemsOut[] = $repeaterRow;
-			}
-			else { // One field per row
-				$newField = clone $this->itemTemplate;
-                $newField->id = $this->id . $newItemIndex;
-				$newField->name = $this->name . "[$newItemIndex]";
-				$newField->classes = $newField->classes .= ' repeaterField-newItem';
-				$repeaterItemsOut[] = $newField->render();
+				else { // One field per row
+					$newField = clone $this->itemTemplate;
+					$newField->id = $this->id . $newItemIndex;
+					$newField->name = $this->name . "[$newItemIndex]";
+					$newField->classes = $newField->classes .= ' repeaterField-newItem';
+					$repeaterItemsOut[] = $newField->render();
+				}
 			}
 		}
 
 		$this->view->repeaterItemsOut = $repeaterItemsOut;
+
+		return parent::run();
 	}
 
 	public function afterValueSet() {
@@ -174,19 +175,18 @@ class RepeaterFieldUi extends FieldUi {
 	/**
 	 * A repeater is considered "populated" if at least one of its children is populated
 	 */
-	protected function isPopulated() {
+	public function isPopulated() {
 		
 		foreach($this->children as $child) {
 			if(is_array($child)) { // Multiple fields per row
 				foreach($child as $subfield) {
-					if(!$subfield->isPopulated()) return true;
+					if($subfield->isPopulated()) return true;
 				}
 			}
 			else { // One field per row
-				if(!$child->isPopulated()) return true;
+				if($child->isPopulated()) return true;
 			}
 		}
-
 		return false;
 	}
 	

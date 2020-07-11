@@ -1,6 +1,6 @@
 <?php namespace ProcessWire;
 class RadioFieldUi extends FieldUi {
-	public $options = array(); // Each option expects a label and a value
+	public $__options = []; // Each option expects a label and a value
 	public $value = '';
     public $cssClass = 'radioField';
 

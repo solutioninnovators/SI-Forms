@@ -1,13 +1,14 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.0.2
+ * @version 1.1.0
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
  * @todo: When setting init values, should we use the field's saveField value to populate it with the database value automatically?
+ * @todo: Possibly create a parent class that both FormUi and FieldUi inherit from.
  *
  */
 class FormUi extends Ui {
@@ -57,8 +58,6 @@ class FormUi extends Ui {
 		foreach($this->fields() as $field) {
 			if(!$field instanceof FieldUi) continue;
 
-			if(!$this->legacyMode) $field->runOptionCallbacks();
-
 			if(isset($_SESSION['Session']['forms'][$this->id][$field->name])) {
 				$field->value = $_SESSION['Session']['forms'][$this->id][$field->name];
 			}
@@ -74,8 +73,6 @@ class FormUi extends Ui {
 	private function pullInputValues() {
 		foreach($this->children as $field) {
 			if(!$field instanceof FieldUi) continue;
-
-			if(!$this->legacyMode) $field->runOptionCallbacks();
 
 			// Set the field's value attribute to the value from from post or get
 			if($field->type === 'file') {
@@ -109,6 +106,7 @@ class FormUi extends Ui {
 
 			$field->afterValueSet();
 		}
+
 	}
 
 	/**
@@ -142,8 +140,10 @@ class FormUi extends Ui {
 				$this->processNonSubmit();
 			}
 		}
-
-		$this->view->fieldsOut = $this->renderFields(); // Render the html for the fields
+		
+		return [
+			'fieldsOut' => $this->renderFields() // Render the html for the fields
+		];
 	}
 
 	/**
@@ -152,8 +152,6 @@ class FormUi extends Ui {
 	protected function setInitValues() {
 		foreach($this->children as $field) {
 			if(!$field instanceof FieldUi) continue;
-
-			$field->runOptionCallbacks();
 
 			if(self::isCallback($field->value)) {
 				$field->value = call_user_func_array($field->value, [$field]);
@@ -247,12 +245,52 @@ class FormUi extends Ui {
 	 */
 	public function fields($name = null) {
 		if($name) {
-			foreach($this->children as $field) {
-				if($field->name == $name) return $field;
-			}
-			return null;
+			return $this->findField($this->children, $name);
 		}
 		else return $this->children;
+	}
+
+	/**
+	 * Returns all fields and subfields in a flattened array
+	 */
+	private function allFields() {
+		$allFieldsArray = [];
+
+		function recurseFields($fields, &$allFieldsArray) {
+			foreach($fields as $field) {
+				$allFieldsArray[] = $field;
+				if(isset($field->children) && is_array($field->children) && count($field->children)) {
+					recurseFields($field->children, $allFieldsArray);
+				}
+			}
+		}
+
+		recurseFields($this->children, $allFieldsArray);
+
+		return $allFieldsArray;
+	}
+
+	/**
+	 * Internal method that recursively does the searching for {@link FormUI::fields} function
+	 *
+	 * @param array $fields
+	 * @param string $name
+	 * @return FieldUI
+	 */
+	private function findField(array $fields, string $name) {
+		foreach($fields as $field) {
+			if($field->name == $name) {
+				return $field;
+			}
+			elseif(isset($field->children) && is_array($field->children)) {
+				// Check sub-groups if they have the field we are looking for
+				$result = $this->findField($field->children, $name);
+				if($result !== null) {
+					return $result;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -341,24 +379,26 @@ class FormUi extends Ui {
 		if(!$this->ajaxSubmit) throw new WireException('ajaxSubmit is not enabled for this form');
 
 		$data = [];
-
 		$data['fieldData'] = [];
 
-        if($this->processSubmit()) {
+		$result = $this->processSubmit();
+		$allFields = $this->allFields();
+
+        if($result) {
 			$data['success'] = 1;
 		}
 		else {
 			// Return any errors found in the validation process
-			$data['error'] = $this->error ?: 1;
+			$data['error'] = $this->error;
 
-			foreach($this->children as $field) {
+			foreach($allFields as $field) {
 				if($field->error) {
 					$data['fieldData'][$field->name]['error'] = $field->error;
 				}
 			}
 		}
 
-        foreach($this->children as $field) {
+        foreach($allFields as $field) {
             if($field->message) {
 				$data['fieldData'][$field->name]['message'] = $field->message;
             }
@@ -377,6 +417,9 @@ class FormUi extends Ui {
 	 * @throws WireException
 	 */
 	protected function ajax_submitField() {
+		// For the sake of field dependencies, we need to set the values for all of the fields in the form
+		$this->pullInputValues();
+
 		$field = $this->fields($this->input->post->field);
 		if(is_array($field) || is_null($field)) {
 			$invalidFieldName = $this->wire('sanitizer')->entities($this->input->post->field);
@@ -386,9 +429,6 @@ class FormUi extends Ui {
 		if(!$field->ajaxValidate && !$field->ajaxSave) {
 			throw new WireException("Ajax is not enabled for $field->name");
 		}
-
-		// For the sake of field dependencies, we need to set the values and options for all of the fields in the form
-		$this->pullInputValues();
 
 		$data = [];
 
@@ -437,4 +477,5 @@ class FormUi extends Ui {
 			return false;
 		}
 	}
+
 }

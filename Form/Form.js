@@ -29,14 +29,15 @@ $(function() {
                     for(var key in data.fieldData) {
                         var value = data.fieldData[key];
 
-                        var $field = $form.find('[data-ui-id=' + key + ']');
+                        var $field = $form.find('.field[data-field-name="' + key + '"]');
+                        var $fieldUi = $field.closest('.ui');
 
                         if(value.error){
                             var $errorElement = $field.find('.field-error').last();
 
                             $errorElement.find('.field-errorTxt').html(value.error);
                             $errorElement.fadeIn();
-                            $field.trigger('ui-error',[value.error]); // Allow other js to pick up on the error event
+                            $fieldUi.trigger('ui-error',[value.error]); // Allow other js to pick up on the error event
                         }
 
                         if(value.message){
@@ -44,13 +45,12 @@ $(function() {
 
                             $messageElement.find('.field-messageTxt').html(value.message);
                             $messageElement.fadeIn();
-                            $field.trigger('ui-message',[value.message]); // Allow other js to pick up on the error event
+                            $fieldUi.trigger('ui-message',[value.message]); // Allow other js to pick up on the error event
                         }
                     }
                 }
 
-                if(data.error) {
-                    if(data.error != 'Please fix the errors indicated below and resubmit the form.') alert(data.error); // @todo: This is a really hacky way to only show the messages we want to
+                if(!data.success) {
                     $ui.trigger('ui-error', [data]); // Allow other js to pick up on the error event
                 }
                 else {
@@ -68,17 +68,17 @@ $(function() {
     /**
      * Submit (Save and/or validate) an individual field when its value changes, within the context of the larger form
      */
-    //@todo: combine the field and ui wrappers?
+    //@todo: combine the field and ui wrappers or trigger events on both?
     $('body').on('ui-value-changed', '.ui', function(e, params) {
         e.stopPropagation();
 
-        var $fieldUI = $(this);
-        var $field = $fieldUI.find('.field');
+        var $fieldUi = $(this);
+        var $field = $fieldUi.find('.field');
 
         // @todo: Change to data-ajax-submit?
         if(!$field.attr('data-ajax-save') && !$field.attr('data-ajax-validate')) return;
 
-        var $form = $fieldUI.closest('form');
+        var $form = $fieldUi.closest('form');
         var $ui = $form.closest('.ui');
         var $saveBadge = $field.find('.field-saveBadge');
         var $spinner = "<i class='fa fa-spin fa-circle-o-notch'></i>";
@@ -102,8 +102,8 @@ $(function() {
             success: function(data) {
                 if(timestamp == $field.attr('data-ajax-timestamp')) { // Only show results of the most recent ajax call
                     if (data.saved) {
-                        $fieldUI.trigger('ui-validated', [value]);
-                        $fieldUI.trigger('ui-saved', [value]);
+                        $fieldUi.trigger('ui-validated', [value]);
+                        $fieldUi.trigger('ui-saved', [value]);
                         console.log('Save successful.');
 
                         $saveBadge.html($checkmark);
@@ -121,10 +121,10 @@ $(function() {
                         $field.find('.field-errorTxt').html(data.error);
                         $field.find('.field-error').fadeIn();
 
-                        $fieldUI.trigger('ui-error', [data.error]); // Allow other js to pick up on the error event
+                        $fieldUi.trigger('ui-error', [data.error]); // Allow other js to pick up on the error event
                     }
                     else { // Value was validated (but not saved)
-                        $fieldUI.trigger('ui-validated', [value]);
+                        $fieldUi.trigger('ui-validated', [value]);
 
                         $field.find('.field-error').fadeOut();
                         $saveBadge.fadeOut();
@@ -134,7 +134,7 @@ $(function() {
                         $field.find('.field-messageTxt').html(data.message);
                         $field.find('.field-message').fadeIn()
 
-                        $fieldUI.trigger('ui-message', [data.message]); // Allow other js to pick up on the message event
+                        $fieldUi.trigger('ui-message', [data.message]); // Allow other js to pick up on the message event
                     } else {
                         $field.find('.field-message').fadeOut();
                     }

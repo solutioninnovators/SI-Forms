@@ -8,8 +8,8 @@
  */
 class CheckboxesFieldUi extends FieldUi {
 
-	public $options = []; // Each option expects a label and a value
 	public $value = [];
+	public $__options = []; // Each option expects a label and a value
 	public $columnize = false; // Sort checkboxes into columns when space allows
 	public $bulkSelectOptions = false;
 	public $cssClass = 'checkboxesField';

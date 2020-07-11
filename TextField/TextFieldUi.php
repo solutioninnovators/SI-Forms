@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 class TextFieldUi extends FieldUi {
 	public $type = 'text'; // Options include text, email, password
-	public $attributes = array(); // Any additional html attributes
+	public $attributes = []; // Any additional html attributes
 	public $maxLength = 255;
 	public $cssClass = 'textField';
 	public $honeypot = false; // Is this a honeypot field?
@@ -42,5 +42,7 @@ class TextFieldUi extends FieldUi {
 			$attributeString .= "$attrKey=\"$attrValue\" ";
 		}
 		$this->view->attributeString = $attributeString;
+		
+		return parent::run();
 	}
 }

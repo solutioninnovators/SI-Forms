@@ -15,6 +15,8 @@ class TimeFieldUi extends FieldUi {
 			if($this->amPm) $this->maxLength = 7;
 			else $this->maxLength = 5;
 		}
+		
+		return parent::run();
 	}
 
 	public function fieldValidate() {
