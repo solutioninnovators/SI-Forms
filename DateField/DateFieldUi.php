@@ -7,8 +7,8 @@ class DateFieldUi extends FieldUi {
 
 	public function setup() {
 		$this->headScripts[] = $this->config->urls->templates . "library/moment.min.js"; // Including moment.js enables additional date format options in pikaday
-		$this->styles[] = $this->url . "/pikaday/pikaday.css";
-		$this->headScripts[] = $this->url . "/pikaday/pikaday.js";
+		$this->styles[] = $this->url . "pikaday/pikaday.css";
+		$this->headScripts[] = $this->url . "pikaday/pikaday.js";
 	}
 
 	protected function fieldValidate() {

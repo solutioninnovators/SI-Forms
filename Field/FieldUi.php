@@ -46,9 +46,7 @@ abstract class FieldUi extends Ui {
 	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (if field dependency logic requires fields to be defined in an order that is different from their display order)
 	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper
 	public $cssClass = ''; // String of classes to add to the field wrapper
-
-	//protected $_callbackQueue = []; // Holds callbacks until they are invoked for the first time
-
+	
 	/**
 	 * When we try to set a property that does not exist, check if there is a corresponding placeholder property with the same name that is preceded by two underscores. If the value we're setting is a callback, store it in the placeholder for execution later. If it isn't, set it to a real property right away and unset the placeholder property.
 	 *

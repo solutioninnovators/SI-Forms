@@ -1,12 +1,13 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.0
+ * @version 1.1.1
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
+ * @todo: Add dependsOn prop to fields to enable auto field refresh via ajax when the value of field(s) it depends on change. Add automatic JS show/hide mechanism by specifying a js string or an array of strings for the show property.
  * @todo: When setting init values, should we use the field's saveField value to populate it with the database value automatically?
  * @todo: Possibly create a parent class that both FormUi and FieldUi inherit from.
  *
@@ -102,9 +103,12 @@ class FormUi extends Ui {
 				if($this->sessionStorage) {
 					$_SESSION['Session']['forms'][$this->id][$field->name] = $rawInputValue;
 				}
-			}
 
-			$field->afterValueSet();
+				$field->afterValueSet();
+			}
+			else { // If there was no value for this field in post or get, we need to pull the default value for it
+				$this->setInitValues([$field]);
+			}
 		}
 
 	}
@@ -148,9 +152,15 @@ class FormUi extends Ui {
 
 	/**
 	 * Set the default values for each field by running their callback functions, if present (e.g. to populate them with their current values from the database)
+	 *
+	 * @param array $fields - An array of the fields you want to set values for. Leave blank to set values for all fields in the form.
 	 */
-	protected function setInitValues() {
-		foreach($this->children as $field) {
+	protected function setInitValues(array $fields = null) {
+		if($fields === null) {
+			$fields = $this->children;
+		}
+
+		foreach($fields as $field) {
 			if(!$field instanceof FieldUi) continue;
 
 			if(self::isCallback($field->value)) {
