@@ -14,9 +14,10 @@ $(function() {
     });
 
     $('.timeField input').on('change', function() {
-        $(this).val(incrementTime($(this).val(), 0, $(this) ));
+        var $input = $(this);
+        $input.val(incrementTime($(this).val(), 0, $(this) ));
         $input.closest('.ui').trigger('ui-value-changed');
-        $(this).trigger('time-change'); // @deprecated
+        $input.trigger('time-change'); // @deprecated
     });
 
     // Handle long mouse presses

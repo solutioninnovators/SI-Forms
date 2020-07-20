@@ -21,6 +21,8 @@ class AutocompleteFieldUi extends FieldUi {
 	public $searchOperator = '%='; // ProcessWire search operator to use to match results
 	public $groupBy; // Name of ProcessWire field to group the suggestions by (if grouping the suggestions is desired)
 	public $cssClass = 'autocompleteField';
+	public $maxLength;
+	public $settings = []; // Array of settings for configuring the jquery.autocomplete.js instance.
 
 	protected function setup() {
 		$this->headScripts[] = $this->url . 'jquery.autocomplete.js'; // This is not the same as jQueryUI Autocomplete. See https://github.com/devbridge/jQuery-Autocomplete

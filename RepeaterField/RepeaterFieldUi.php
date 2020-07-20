@@ -38,6 +38,8 @@ class RepeaterFieldUi extends FieldUi {
 					$subfield->id = $this->id . $repeaterItemIteration . $subfield->id;
 					$subfield->name = $this->name . "[$repeaterItemIteration][$subfieldName]";
 					$subfield->value = $repeaterItemValue[$subfieldName];
+					$subfield->iteration = $repeaterItemIteration;
+					$subfield->form = $this->form;
 					$repeaterItems[$repeaterItemIteration][$subfieldName] = $subfield;
 
 					$subfieldIteration++;
@@ -48,6 +50,8 @@ class RepeaterFieldUi extends FieldUi {
 				$subfield->id = $this->id . $repeaterItemIteration;
 				$subfield->name = $this->name . "[$repeaterItemIteration]";
 				$subfield->value = $repeaterItemValue;
+				$subfield->iteration = $repeaterItemIteration;
+				$subfield->form = $this->form;
 				$repeaterItems[] = $subfield;
 			}
 

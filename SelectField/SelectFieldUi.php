@@ -2,6 +2,7 @@
 class SelectFieldUi extends FieldUi {
 
 	public $__options = []; // Each option expects a label and a value
+	public $cssClass = 'selectField';
 	public $autocomplete = false; // Progressively enhances the search field with autocomplete search
 	
 	protected function setup() {

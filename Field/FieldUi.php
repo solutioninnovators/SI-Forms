@@ -30,7 +30,7 @@ abstract class FieldUi extends Ui {
 	public $__disabled = false;
 	public $ajaxValidate = false; // Validate the field with ajax (but don't save)
 	public $ajaxSave = false; // Turn on ajax save (also validates)
-	public $savePage; // Optional ProcessWire Page object or ID to save the field to (used for AJAX saves)
+	public $savePage; // Optional ProcessWire Page object to save the field to (used for AJAX saves)
 	public $saveField; // Optional ProcessWire Field name - if different from this UI's name property (used for AJAX saves)
 	public $__icon = '';
 	public $__label = '';
@@ -205,43 +205,62 @@ abstract class FieldUi extends Ui {
 
 	/**
 	 * Save the field based on the savePage and saveField values defined
+	 * Uses the form's savePage if the field doesn't have one.
+	 *
 	 * NOTE: Does NOT validate before saving! Call validate() first!
+	 *
+	 * @param bool forceSaveNow - Specify true to override the default behavior and force the field to save changes immediately no matter what
 	 */
-	public function save() {
-		// If $savePage specified as ID, convert to Page
-		if($this->savePage instanceof Page) {
+	public function save($forceSaveNow = false) {
+		$savePage = null;
+		$saveNow = true;
+
+		if($this->savePage) {
 			$savePage = $this->savePage;
-		} else {
-			$savePage = $this->pages->get((int)$this->savePage);
+		}
+		elseif(isset($this->form) && isset($this->form->savePage)) { // Fallback to the form's savePage setting
+			$savePage = $this->form->savePage;
+			$saveNow = false; // If using the form's savePage setting, we wait until all fields have been set to save off the page
 		}
 
-		if(!$savePage->id) return false;
-
-		// If no saveField specified, fallback to UI name
+		// If no saveField specified, fallback to the field's UI name
 		if($this->saveField) {
 			$saveField = $this->saveField;
 		} else {
 			$saveField = $this->name;
 		}
 
-		$this->saveField = $saveField;
-		$this->savePage = $savePage;
-
 		if(FormUi::isCallback($this->saveCallback)) {
-			return call_user_func_array($this->saveCallback, [$this, $this->form]);
+			$result = call_user_func_array($this->saveCallback, [$this, $this->form, $savePage, $saveField]);
 		}
 		else {
-			return $this->fieldSave();
+			$result = $this->fieldSave();
 		}
+
+		// If a value was returned, we'll save it to the field. Otherwise, we assume that the function already saved the field.
+		if(!is_null($result)) {
+			$of = $savePage->of(false);
+			$savePage->set($saveField, $result);
+			if($saveNow || $forceSaveNow)
+				$return = $savePage->save($saveField); // If the savePage is set on the field rather than the form, save it right away
+			$savePage->of($of);
+		}
+		else {
+			$return = true;
+		}
+
+		return $return;
 	}
+
 
 	/**
 	 * Default save procedure. Subclasses should overwrite this method, if necessary.
 	 * Note that $this->savePage and $this->saveField are prepared at this point
-	 * @return bool
+	 *
+	 * @return mixed - Return the value that should be saved to the saveField on the savePage
 	 */
 	protected function fieldSave() {
-		return $this->savePage->setAndSave($this->saveField, $this->value);
+		return $this->value;
 	}
 
 	/**

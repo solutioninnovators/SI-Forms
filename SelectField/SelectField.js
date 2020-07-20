@@ -15,7 +15,7 @@ $(function() {
     init();
 
     // re-initialize on reload
-	$('body').on('reloaded', '*', function(e) {
+	$('body').on('ui-reloaded', '*', function(e) {
 		init();
 	});
 

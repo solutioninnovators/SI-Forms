@@ -39,10 +39,10 @@ class TextFieldUi extends FieldUi {
 		// Convert attributes array into a string for output
 		$attributeString = '';
 		foreach($this->attributes as $attrKey => $attrValue) {
-			$attributeString .= "$attrKey=\"$attrValue\" ";
+			$attributeString .= $this->sanitizer->entities1($attrKey) . '="' . $this->sanitizer->entities1($attrValue) . '" ';
 		}
 		$this->view->attributeString = $attributeString;
-		
+
 		return parent::run();
 	}
 }

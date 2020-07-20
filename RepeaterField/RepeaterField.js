@@ -51,4 +51,12 @@ $(function() {
             updateIndexes($repeater);
         }, 100);
     });
+
+    // When any field inside the repeater changes, also trigger a change on the repeater itself
+    $('body').on('ui-value-changed', '.ui', function() {
+        var $repeaterParent = $(this).parent().closest('.ui_RepeaterField');
+        if($repeaterParent.length) {
+            $repeaterParent.trigger('ui-value-changed');
+        }
+    });
 });

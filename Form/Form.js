@@ -80,13 +80,15 @@ $(function() {
 
         var $form = $fieldUi.closest('form');
         var $ui = $form.closest('.ui');
-        var $saveBadge = $field.find('.field-saveBadge');
+        var $saveBadge = $field.find('.field-saveBadge').first(); // First is specified, just in case this is a repeater with fields inside it
         var $spinner = "<i class='fa fa-spin fa-circle-o-notch'></i>";
         var $checkmark = "<i class='fa fa-check-circle'></i>";
         var saveBadgeTimeout = null;
         var timestamp = new Date().getTime();
-        var value = params.value;
+        var value = params && params.value ? params.value : null;
         var fieldName = $field.attr('data-field-name');
+        var $errorElement = $field.find('.field-error').last();
+        var $messageElement = $field.find('.field-message').last();
 
         // Set the time of this ajax call
         $field.attr('data-ajax-timestamp', timestamp);
@@ -107,8 +109,8 @@ $(function() {
                         console.log('Save successful.');
 
                         $saveBadge.html($checkmark);
-                        $field.find('.field-error').fadeOut();
-                        $field.find('.field-message').fadeOut();
+                        $errorElement.fadeOut();
+                        $messageElement.fadeOut();
 
                         saveBadgeTimeout = setTimeout(function () {
                             $saveBadge.fadeOut(1000);
@@ -118,25 +120,25 @@ $(function() {
                         console.log('Invalid input.');
 
                         $saveBadge.fadeOut();
-                        $field.find('.field-errorTxt').html(data.error);
-                        $field.find('.field-error').fadeIn();
+                        $errorElement.find('.field-errorTxt').html(data.error);
+                        $errorElement.fadeIn();
 
                         $fieldUi.trigger('ui-error', [data.error]); // Allow other js to pick up on the error event
                     }
                     else { // Value was validated (but not saved)
                         $fieldUi.trigger('ui-validated', [value]);
 
-                        $field.find('.field-error').fadeOut();
+                        $errorElement.fadeOut();
                         $saveBadge.fadeOut();
                     }
 
                     if (data.message) {
-                        $field.find('.field-messageTxt').html(data.message);
-                        $field.find('.field-message').fadeIn()
+                        $messageElement.find('.field-messageTxt').html(data.message);
+                        $messageElement.fadeIn()
 
                         $fieldUi.trigger('ui-message', [data.message]); // Allow other js to pick up on the message event
                     } else {
-                        $field.find('.field-message').fadeOut();
+                        $messageElement.fadeOut();
                     }
 
                 }

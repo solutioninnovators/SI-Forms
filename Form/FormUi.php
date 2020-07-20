@@ -1,15 +1,16 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.1
+ * @version 1.1.2
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
  * @todo: Add dependsOn prop to fields to enable auto field refresh via ajax when the value of field(s) it depends on change. Add automatic JS show/hide mechanism by specifying a js string or an array of strings for the show property.
- * @todo: When setting init values, should we use the field's saveField value to populate it with the database value automatically?
+ * @todo: When setting init values, should we have an option to use the field's saveField value to populate it with the database value automatically? We could add a getDbValue and getDbValueCallback
  * @todo: Possibly create a parent class that both FormUi and FieldUi inherit from.
+ * @todo: Also add option to save individual fields that are valid (during validation) even when not all fields are valid?
  *
  */
 class FormUi extends Ui {
@@ -26,6 +27,7 @@ class FormUi extends Ui {
 	public $sessionStorage = false; // Enable automatic storage and retrieval of field values in the session
 	public $error; // Holds an error set by the form after validate() is called
 	public $ajaxSubmit = false; // Should the form be submitted via ajax? (avoids refreshing the page)
+	public $savePage; // Optional ProcessWire page field to automatically save values to on a successful form submission (used for fields where $savePage is not set on the field itself)
 	public $validateCallback; // Additional validation to run after the individual fields are validated and before the success callback. Should return true|false. You may also return an error string.
 	public $successCallback; // Callback method to process the form data after successful validation
 	public $errorCallback; // Callback to run if the validation was unsuccessful
@@ -268,7 +270,14 @@ class FormUi extends Ui {
 
 		function recurseFields($fields, &$allFieldsArray) {
 			foreach($fields as $field) {
-				$allFieldsArray[] = $field;
+				if(is_array($field)) { // Repeaters with multiple fields per row
+					foreach($field as $f) {
+						$allFieldsArray[] = $f;
+					}
+				}
+				else {
+					$allFieldsArray[] = $field;
+				}
 				if(isset($field->children) && is_array($field->children) && count($field->children)) {
 					recurseFields($field->children, $allFieldsArray);
 				}
@@ -289,7 +298,14 @@ class FormUi extends Ui {
 	 */
 	private function findField(array $fields, string $name) {
 		foreach($fields as $field) {
-			if($field->name == $name) {
+			if(is_array($field)) { // Repeaters with multiple fields per row
+				foreach($field as $f) {
+					if($f->name == $name) {
+						return $f;
+					}
+				}
+			}
+			elseif($field->name == $name) {
 				return $field;
 			}
 			elseif(isset($field->children) && is_array($field->children)) {
@@ -352,15 +368,10 @@ class FormUi extends Ui {
 		$this->pullInputValues(); // Get the submitted values from post or get
 
 		if($this->validate()) {
-			// If the fields have a savePage defined, go ahead and try to save them automatically
-			// @todo: Also add option to save individual fields that are valid (during validation) even when not all fields are valid?
-			foreach($this->children as $field) {
-				if($field->savePage || $field->saveCallback) {
-					$field->save();
-				}
-			}
+			// Save any fields that are configured to save automatically
+			$this->saveForm();
 
-			// If a callback function was specified, call it now
+			// If a success callback function was specified, call it now
 			if(self::isCallback($this->successCallback)) {
 				call_user_func_array($this->successCallback, [$this]);
 			}
@@ -374,6 +385,25 @@ class FormUi extends Ui {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Saves any fields on the form that have a savePage or a saveCallback defined, or if the form itself has a savePage defined.
+	 */
+	protected function saveForm() {
+		// If the form or fields have a savePage defined, or the fields have a saveCallback defined, go ahead and try to save them automatically
+		foreach($this->children as $field) {
+			if($this->savePage || $field->savePage || $field->saveCallback) {
+				$field->save();
+			}
+		}
+
+		// If there is a savePage set on the form itself, we call save once at the end, for better efficiency.
+		if($this->savePage) {
+			$of = $this->savePage->of(false);
+			$this->savePage->save();
+			$this->savePage->of($of);
+		}
 	}
 
 	protected function processNonSubmit() {
@@ -462,7 +492,7 @@ class FormUi extends Ui {
 
 		// If ajaxSave is enabled, go ahead and save the field
 		if($valid && $field->ajaxSave) {
-			if($field->save()) {
+			if($field->save(true)) {
 				$data['saved'] = 1;
 			}
 			else {
