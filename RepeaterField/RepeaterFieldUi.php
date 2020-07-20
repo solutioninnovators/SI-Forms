@@ -141,7 +141,8 @@ class RepeaterFieldUi extends FieldUi {
 		$totalChildren = count($this->children);
 		if($this->showBlankItem || $totalChildren == 0) {
 			// Don't create an additional element if the last child already isn't populated
-			if($totalChildren < 1 || $this->children[$totalChildren - 1]->isPopulated()) {
+			$lastChild = $this->children[$totalChildren - 1];
+			if($totalChildren < 1 || ($lastChild instanceof FieldUi && $lastChild->isPopulated())) { // todo: This currently only accounts for rows with a single field
 
 				$newItemIndex = $totalChildren;
 
