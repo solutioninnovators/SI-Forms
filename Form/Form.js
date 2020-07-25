@@ -64,6 +64,44 @@ $(function() {
         });
     });
 
+    /**
+     * When a field's value changes, reload any of the fields it depends on, while preserving their values
+     */
+    $('body').on('ui-value-changed', '.ui', function(e, params) {
+        var $field = $(this).find('.field');
+        var fieldName = $field.attr('data-field-name');
+        var $form = $field.closest('form');
+
+        // Find all the fields that depend on this one
+        var $fields = $(".field[data-depends-on~='" + fieldName + "']");
+
+        if($fields.length) {
+            var fieldNames = [];
+            $fields.each(function() {
+                fieldNames.push($(this).attr('data-field-name'));
+            });
+
+            var extraParams = {
+                fieldNames: fieldNames
+            };
+
+            // Add the form fields to the extra parameters and turn all parameters into a query string
+            extraParams = $form.serialize() + '&' + $.param(extraParams);
+
+            // Get the view for each of the fields we want to reload and plug them in where they belong
+            UiBlocks.ajax($form.closest('.ui'), 'reloadFields', extraParams, $form.attr('method'), $form.closest('.ui[data-ui-url]').attr('data-ui-url')).then(function(data) {
+                $fields.each(function() {
+                    var $newView = $(data.views[$(this).attr('data-field-name')]);
+                    $(this).closest('.ui').replaceWith($newView);
+                    $newView.css({opacity: 0.5}).animate({opacity: 1}, 100);
+                    $newView.trigger('ui-reloaded'); // Trigger a reloaded event when the ui is reloaded
+                });
+            },
+            function() {
+                console.log('Could not reload dependant fields due to a network error.');
+            });
+        }
+    });
 
     /**
      * Submit (Save and/or validate) an individual field when its value changes, within the context of the larger form

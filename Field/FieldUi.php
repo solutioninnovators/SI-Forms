@@ -44,8 +44,9 @@ abstract class FieldUi extends Ui {
 	public $autocomplete = false; // Turn on/off browser autocomplete functionality
 	public $__show = true; // Should the field be shown or hidden? (for field dependencies)
 	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (if field dependency logic requires fields to be defined in an order that is different from their display order)
-	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper
-	public $cssClass = ''; // String of classes to add to the field wrapper
+	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper @todo: Change to fieldAttributes
+	public $cssClass = ''; // String of classes to add to the field wrapper @todo: Change to fieldClass?
+	public $dependsOn = []; // Array containing the names of fields that this field depends on. If the value of any of these fields changes, this field will reload via ajax
 	
 	/**
 	 * When we try to set a property that does not exist, check if there is a corresponding placeholder property with the same name that is preceded by two underscores. If the value we're setting is a callback, store it in the placeholder for execution later. If it isn't, set it to a real property right away and unset the placeholder property.
@@ -274,6 +275,7 @@ abstract class FieldUi extends Ui {
 	 */
 	protected function run() {
 		$this->runRemainingCallbacks();
+
 		if(!$this->show) {
 			$this->wrapperAttributes['style'] = 'display:none;';
 		}

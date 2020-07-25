@@ -1,0 +1,64 @@
+.field {
+    margin-bottom: 1rem;
+    position: relative;
+}
+    .field-label {
+        display: block;
+        font-weight: bold;
+        font-size: .875rem;
+        color: #565656;
+        margin-bottom: .3rem;
+    }
+    .field-input {
+        width: 100%;
+        max-width: 100%;
+    }
+    .field-required {
+        color: #cd4d4d;
+        font-weight: 600;
+    }
+    .field-description {
+        font-size: .85em;
+        color: #5A5A5A;
+        margin-bottom: .5rem;
+    }
+    .field-notes {
+        font-size: .75em;
+        font-style: italic;
+        color: #5A5A5A;
+        margin-top: .2rem;
+        margin-bottom: 0;
+    }
+    .field-error {
+        display: block;
+        font-size: .75em;
+        font-weight: bold;
+        width: 100%;
+        color: #cd4d4d;
+        margin-top: .3rem;
+    }
+    .field-message {
+        display: block;
+        font-size: .9em;
+        font-weight: bold;
+        width: 100%;
+        color: #5690c5;
+        margin-top: .3rem;
+    }
+    .field-noValue {
+        color: #aaa;
+        font-size: .75em;
+    }
+    .field-saveBadge {
+    }
+
+.saveBadge {
+    position: absolute;
+    top: 0; right: -1.25rem;
+    font-size: .95rem;
+    color: #888;
+    z-index: 999;
+}
+    .saveBadge .fa-check-circle {
+        color: #93BF0D;
+    }

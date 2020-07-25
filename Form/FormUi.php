@@ -1,13 +1,12 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.3
+ * @version 1.1.4
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
- * @todo: Add dependsOn prop to fields to enable auto field refresh via ajax when the value of field(s) it depends on change. Add automatic JS show/hide mechanism by specifying a js string or an array of strings for the show property.
  * @todo: When setting init values, should we have an option to use the field's saveField value to populate it with the database value automatically? We could add a getDbValue and getDbValueCallback
  * @todo: Possibly create a parent class that both FormUi and FieldUi inherit from.
  * @todo: Also add option to save individual fields that are valid (during validation) even when not all fields are valid?
@@ -72,8 +71,10 @@ class FormUi extends Ui {
 	/**
 	 * Pulls values from post or get
 	 *
+	 * @param boolean $ignoreBlankValues - If set to true, the value will only be pulled if it is a value that would render the field "populated". Otherwise, the default value will be used. This is used when reloading fields with dependencies.
+	 *
 	 */
-	private function pullInputValues() {
+	private function pullInputValues($ignoreBlankValues = false) {
 		foreach($this->children as $field) {
 			if(!$field instanceof FieldUi) continue;
 
@@ -99,11 +100,20 @@ class FormUi extends Ui {
 					$rawInputValue = [];
 				}
 
+				$initValue = $field->value;
 				$field->value = $rawInputValue; // Set the field's value attribute to the value from post or get
+
+				if($ignoreBlankValues) {
+					// If the field would now be considered unpopulated, reset the field value back to the initial/default value
+					if(!$field->isPopulated()) {
+						$field->value = $initValue;
+						$this->setInitValues([$field]);
+					}
+				}
 
 				// Save the value to the session (if session storage is on)
 				if($this->sessionStorage) {
-					$_SESSION['Session']['forms'][$this->id][$field->name] = $rawInputValue;
+					$_SESSION['Session']['forms'][$this->id][$field->name] = $field->value;
 				}
 
 				$field->afterValueSet();
@@ -166,7 +176,7 @@ class FormUi extends Ui {
 			if(!$field instanceof FieldUi) continue;
 
 			if(self::isCallback($field->value)) {
-				$field->value = call_user_func_array($field->value, [$field]);
+				$field->value = call_user_func_array($field->value, [$field, $this]);
 			}
 
 			$field->afterValueSet();
@@ -501,6 +511,30 @@ class FormUi extends Ui {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Reload one or more fields in the form via ajax to update its view
+	 */
+	protected function ajax_reloadFields($input) {
+		// For the sake of field dependencies and to preserve the current user-provided values for the fields we're reloading, we need to set the values for all of the fields in the form first
+		$this->pullInputValues(true);
+
+		$fieldNames = $this->sanitizer->array($input['fieldNames'], 'text');
+
+		$views = [];
+		foreach($fieldNames as $fieldName) {
+			$field = $this->fields($fieldName);
+
+			if($field instanceof FieldUi) {
+				$views[$fieldName] = $field->render();
+			}
+		}
+
+		return [
+			'views' => $views
+		];
+
 	}
 
 	/**
