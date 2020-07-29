@@ -140,9 +140,9 @@ class RepeaterFieldUi extends FieldUi {
 		// Create an additional blank field for new input
 		$totalChildren = count($this->children);
 		if($this->showBlankItem || $totalChildren == 0) {
-			// Don't create an additional element if the last child already isn't populated
-			$lastChild = $this->children[$totalChildren - 1];
-			if($totalChildren < 1 || ($lastChild instanceof FieldUi && $lastChild->isPopulated())) { // todo: This currently only accounts for rows with a single field
+			// Don't create an additional element if the last child is already unpopulated
+			$lastChild = $totalChildren > 0 ? $this->children[$totalChildren - 1] : null;
+			if($totalChildren < 1 || ($lastChild && $this->childIsPopulated($lastChild))) {
 
 				$newItemIndex = $totalChildren;
 
@@ -181,16 +181,22 @@ class RepeaterFieldUi extends FieldUi {
 	 * A repeater is considered "populated" if at least one of its children is populated
 	 */
 	public function isPopulated() {
-		
 		foreach($this->children as $child) {
-			if(is_array($child)) { // Multiple fields per row
-				foreach($child as $subfield) {
-					if($subfield->isPopulated()) return true;
-				}
+			if($this->childIsPopulated($child))
+				return true;
+		}
+		return false;
+	}
+
+	public function childIsPopulated($child) {
+		if(is_array($child)) { // Child is an array of fields
+			foreach($child as $subfield) {
+				if($subfield instanceof FieldUi && $subfield->isPopulated())
+					return true;
 			}
-			else { // One field per row
-				if($child->isPopulated()) return true;
-			}
+		}
+		elseif($child instanceof FieldUi) { // Child is a single field
+			return $child->isPopulated();
 		}
 		return false;
 	}

@@ -30,7 +30,7 @@ abstract class FieldUi extends Ui {
 	public $__disabled = false;
 	public $ajaxValidate = false; // Validate the field with ajax (but don't save)
 	public $ajaxSave = false; // Turn on ajax save (also validates)
-	public $savePage; // Optional ProcessWire Page object to save the field to (used for AJAX saves)
+	public $savePage; // Optional ProcessWire Page object to save the field to (used for AJAX saves). Set to false if you wish to disable automatic saving for this field even if you have savePage set on the form.
 	public $saveField; // Optional ProcessWire Field name - if different from this UI's name property (used for AJAX saves)
 	public $__icon = '';
 	public $__label = '';
@@ -47,6 +47,7 @@ abstract class FieldUi extends Ui {
 	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper @todo: Change to fieldAttributes
 	public $cssClass = ''; // String of classes to add to the field wrapper @todo: Change to fieldClass?
 	public $dependsOn = []; // Array containing the names of fields that this field depends on. If the value of any of these fields changes, this field will reload via ajax
+	public $resetValueOnReload = false; // If set to true, any time this field reloads as a result of a change of the value of another field specified in its $dependsOn array, the value of this field will reset to the default value, even if the user populated it with something else.
 	
 	/**
 	 * When we try to set a property that does not exist, check if there is a corresponding placeholder property with the same name that is preceded by two underscores. If the value we're setting is a callback, store it in the placeholder for execution later. If it isn't, set it to a real property right away and unset the placeholder property.

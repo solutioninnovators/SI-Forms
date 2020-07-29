@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.4
+ * @version 1.1.5
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
@@ -74,7 +74,7 @@ class FormUi extends Ui {
 	 * @param boolean $ignoreBlankValues - If set to true, the value will only be pulled if it is a value that would render the field "populated". Otherwise, the default value will be used. This is used when reloading fields with dependencies.
 	 *
 	 */
-	private function pullInputValues($ignoreBlankValues = false) {
+	private function pullInputValues($ignoreBlankValues = false, $excludedFields = []) {
 		foreach($this->children as $field) {
 			if(!$field instanceof FieldUi) continue;
 
@@ -103,20 +103,19 @@ class FormUi extends Ui {
 				$initValue = $field->value;
 				$field->value = $rawInputValue; // Set the field's value attribute to the value from post or get
 
-				if($ignoreBlankValues) {
-					// If the field would now be considered unpopulated, reset the field value back to the initial/default value
-					if(!$field->isPopulated()) {
-						$field->value = $initValue;
-						$this->setInitValues([$field]);
-					}
+				// If we're ignoring blank values and the field would now be considered unpopulated, or if we are explicitly excluding it, reset the field value back to the initial/default value and process its callback if necessary
+				if(($ignoreBlankValues && !$field->isPopulated()) || in_array($field->name, $excludedFields)) {
+					$field->value = $initValue;
+					$this->setInitValues([$field]); // This includes a call to afterValueSet()
+				}
+				else {
+					$field->afterValueSet();
 				}
 
 				// Save the value to the session (if session storage is on)
 				if($this->sessionStorage) {
 					$_SESSION['Session']['forms'][$this->id][$field->name] = $field->value;
 				}
-
-				$field->afterValueSet();
 			}
 			else { // If there was no value for this field in post or get, we need to pull the default value for it
 				$this->setInitValues([$field]);
@@ -403,7 +402,7 @@ class FormUi extends Ui {
 	protected function saveForm() {
 		// If the form or fields have a savePage defined, or the fields have a saveCallback defined, go ahead and try to save them automatically
 		foreach($this->children as $field) {
-			if($this->savePage || $field->savePage || $field->saveCallback) {
+			if(($this->savePage && $field->savePage !== false) || $field->savePage || $field->saveCallback) {
 				$field->save();
 			}
 		}
@@ -517,11 +516,21 @@ class FormUi extends Ui {
 	 * Reload one or more fields in the form via ajax to update its view
 	 */
 	protected function ajax_reloadFields($input) {
-		// For the sake of field dependencies and to preserve the current user-provided values for the fields we're reloading, we need to set the values for all of the fields in the form first
-		$this->pullInputValues(true);
-
 		$fieldNames = $this->sanitizer->array($input['fieldNames'], 'text');
 
+		// For the sake of field dependencies and to preserve the current user-provided values for the fields we're reloading, we need to set the values for all of the fields in the form first. If the resetValueOnReload property is set, we want to exclude them so that their default values will take precedence over the user-submitted values.
+		$excludedFields = [];
+		foreach($fieldNames as $fieldName) {
+			$field = $this->fields($fieldName);
+
+			if($field->resetValueOnReload) {
+				$excludedFields[] = $fieldName;
+			}
+		}
+		$this->pullInputValues(true, $excludedFields);
+
+
+		// Render and return the views for each field we requested
 		$views = [];
 		foreach($fieldNames as $fieldName) {
 			$field = $this->fields($fieldName);
