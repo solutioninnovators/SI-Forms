@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.6
+ * @version 1.1.7
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
@@ -33,6 +33,7 @@ class FormUi extends Ui {
 	public $novalidate = true; // Disable the browser's built in validation on HTML5 inputs
 	public $legacyMode = false; // Allows older implementations of SI Form (prior to the use of the successCallback and errorCallback) to function properly without having to make any changes to the implementation
 	public $sessionValuesPulled = false; // For use with $legacyMode only
+	public $alwaysProcess = false; // Should the form undergo validation/processing every time it is rendered, even if the user didn't submit it? For example, a search form that should perform the search on every page load, regardless of whether the user submitted it.
 
 	// Regions inside the form tags that may be populated with html
 	public $beforeForm = '';
@@ -376,6 +377,10 @@ class FormUi extends Ui {
 	protected function processSubmit() {
 		$this->pullInputValues(); // Get the submitted values from post or get
 
+		return $this->processForm();
+	}
+
+	protected function processForm() {
 		if($this->validate()) {
 			// Save any fields that are configured to save automatically
 			$this->saveForm();
@@ -391,9 +396,9 @@ class FormUi extends Ui {
 			if(self::isCallback($this->errorCallback)) {
 				call_user_func_array($this->errorCallback, [$this]);
 			}
-		}
 
-		return false;
+			return false;
+		}
 	}
 
 	/**
@@ -421,6 +426,10 @@ class FormUi extends Ui {
 		}
 		else {
 			$this->setInitValues();
+		}
+
+		if($this->alwaysProcess) {
+			$this->processForm();
 		}
 	}
 
