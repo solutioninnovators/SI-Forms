@@ -9,7 +9,7 @@
 		<?php endif ?>
 	</div>
 <?php else: ?>
-	<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?= $sanitizer->entities1($attributeString) ?> id="input_<?= $sanitizer->entities1($id) ?>" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="<?= $sanitizer->entities1($type) ?>" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $this->type !== 'password' ? $sanitizer->entities1($value) : '' ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> <?= $autofocus ? 'autofocus="autofocus"' : '' ?> <?= !$autocomplete ? 'autocomplete="off"' : '' ?> />
+	<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?= $attributeString ?> id="input_<?= $sanitizer->entities1($id) ?>" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="<?= $sanitizer->entities1($type) ?>" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $this->type !== 'password' ? $sanitizer->entities1($value) : '' ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> <?= $autofocus ? 'autofocus="autofocus"' : '' ?> <?= !$autocomplete ? 'autocomplete="off"' : '' ?> />
 <?php endif ?>
 
 <?php include('../Field/footer.php') ?>

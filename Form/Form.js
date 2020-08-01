@@ -88,6 +88,11 @@ $(function() {
             // Add the form fields to the extra parameters and turn all parameters into a query string
             extraParams = $form.serialize() + '&' + $.param(extraParams);
 
+            // Trigger a reloading event for each of the fields for ohers to pick up on
+            $fields.each(function() {
+                $(this).closest('.ui').trigger('ui-reloading');
+            });
+
             // Get the view for each of the fields we want to reload and plug them in where they belong
             UiBlocks.ajax($form.closest('.ui'), 'reloadFields', extraParams, $form.attr('method'), $form.closest('.ui[data-ui-url]').attr('data-ui-url')).then(function(data) {
                 $fields.each(function() {
