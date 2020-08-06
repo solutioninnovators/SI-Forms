@@ -1,6 +1,6 @@
 <?php include('../Field/header.php') ?>
 
-	<input type="hidden" class="field-fallback" name="<?= $name ?>" value="#" />
+	<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="#" />
 
 	<?php foreach($options as $option): ?>
 		<label class="radioField-option <?= isset($option['tooltip']) ? 'tooltip' : '' ?> <?= isset($option['disabled']) && $option['disabled'] ? 'radioField-disabled':'' ?>" title="<?= isset($option['tooltip']) ? $option['tooltip'] : '' ?>"  >

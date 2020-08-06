@@ -20,7 +20,8 @@ class NumberFieldUi extends FieldUi {
             }
         }
 
-		$regex = '/^[0-9]*$/';
+		//$regex = '/^[0-9]*$/';
+        $regex = '/^[-+]?\d+(\.\d+)?$/';
 
 		if(!preg_match($regex, $this->value)) {
             $this->error = __('Invalid number.');
