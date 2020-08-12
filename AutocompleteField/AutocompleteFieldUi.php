@@ -12,8 +12,8 @@
 class AutocompleteFieldUi extends FieldUi {
 	public $searchFields = 'title'; // Pipe separated list of field names to search
 	public $searchById = true; // Show matching result in the autocomplete when a valid page ID is entered directly
-	public $searchSelector; // A selector string to narrow down the pages that will be searched
-	public $validateSelector; // Optional selector string to validate the user's input. If not specified, the $searchSelector will be used. Use this when you want to allow certain values but don't want them to show in the autocomplete search results.
+	public $__searchSelector; // A selector string to narrow down the pages that will be searched
+	public $__validateSelector; // Optional selector string to validate the user's input. If not specified, the $searchSelector will be used. Use this when you want to allow certain values but don't want them to show in the autocomplete search results.
 	public $resultsLabel = 'title'; // Field name to use for the result label
 	public $resultsLabelString; // Use for complex labels with multiple data fields. Specify one or more field names surrounded by curly {brackets} along with any additional characters, spacing or punctuation.
 	public $allowStringValue = false; // Allows the field to accept an arbitrary string value as an alternative to a page ID

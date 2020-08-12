@@ -31,8 +31,8 @@ $(function() {
         $repeater.find('.repeaterField-items').append($newItem);
         $newItem.slideDown(100);
 
-        updateIndexes($repeater)
-
+        updateIndexes($repeater);
+        $newItem.find('.ui').trigger('ui-reloaded');
     });
 
     $('body').on('click', '.repeaterField-remove', function(e) {

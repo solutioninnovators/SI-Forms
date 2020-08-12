@@ -1,6 +1,14 @@
 $(function () {
     $('.autocompleteField .field-input').each(function () {
-        var $this = $(this);
+        init($(this));
+    });
+
+    $('body').on('ui-reloaded', '.ui_AutocompleteField', function(){
+       init($(this).find('.field-input'));
+    });
+
+    function init($field){
+        var $this = $field;
         var $realField = $this.siblings('.autocompleteField-value');
         var previousValue = $realField.val();
         var $spinner = $this.siblings('.autocompleteField-spinner');
@@ -29,7 +37,7 @@ $(function () {
                 $spinner.hide();
             },
         };
-        
+
         var customSettings = $.parseJSON($this.attr('data-settings'));
         var settings = $.extend(defaultSettings, customSettings);
 
@@ -43,8 +51,8 @@ $(function () {
             }
             previousValue = $this.val();
         }, 500));
-    });
 
+    }
 
     function queryStringToJSON() {
         var pairs = location.search.slice(1).split('&');
