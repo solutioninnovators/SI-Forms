@@ -2,8 +2,8 @@
 class DateFieldUi extends FieldUi {
 
 	public $cssClass = 'dateField';
-	public $jsDateFormat = 'Y-m-d';
-	public $phpDateFormat = 'YYYY-MM-DD';
+	public $jsDateFormat = 'YYYY-MM-DD';
+	public $phpDateFormat = 'Y-m-d';
 
 	public function setup() {
 		$this->headScripts[] = $this->config->urls->templates . "library/moment.min.js"; // Including moment.js enables additional date format options in pikaday
