@@ -52,6 +52,12 @@ $(function () {
             previousValue = $this.val();
         }, 500));
 
+        // Trigger ui-value-changed event on the UI Block when field is changed
+        $realField.on('change', function() {
+            var $this = $(this);
+            var $ui = $this.closest('.ui');
+            $ui.trigger('ui-value-changed', [{value: $this.val()}]);
+        });
     }
 
     function queryStringToJSON() {

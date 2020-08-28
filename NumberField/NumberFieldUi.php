@@ -5,6 +5,7 @@ class NumberFieldUi extends FieldUi {
 	public $cssClass = 'numberField';
 	public $max;
 	public $min;
+	public $maxLength;
 
 	public function fieldValidate() {
 

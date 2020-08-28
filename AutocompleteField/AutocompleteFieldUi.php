@@ -60,7 +60,7 @@ class AutocompleteFieldUi extends FieldUi {
 
 	protected function fieldValidate() {
 
-		if($this->allowStringValue == false) {
+		if($this->allowStringValue == false || ctype_digit($this->value)) {
 			// Make sure value is an ID that matches a valid page for this field
 			if(!$this->pages->get($this->buildValidateSelector())->id) {
 				$this->error = __('Invalid selection.');

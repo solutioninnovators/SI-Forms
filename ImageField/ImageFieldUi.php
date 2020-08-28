@@ -19,7 +19,8 @@ class ImageFieldUi extends FieldUi {
 	public $maxHeight = 800;
 	public $savePage = null;
 	public $saveField = null;
-	public $cssClasses = 'imageField';
+	public $buttonClasses = '';
+	public $cssClass = 'imageField';
 	
 	public function fieldValidate() {
 		$value = $this->value;

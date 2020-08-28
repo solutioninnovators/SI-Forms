@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.12
+ * @version 1.1.13
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
@@ -72,7 +72,9 @@ class FormUi extends Ui {
 	/**
 	 * Pulls values from post or get
 	 *
-	 * @param boolean $ignoreBlankValues - If set to true, the value will only be pulled if it is a value that would render the field "populated". Otherwise, the default value will be used. This is used when reloading fields with dependencies.
+	 * @param boolean $ignoreBlankValues - If set to true, the value will only be pulled if it is a value that would render the field "populated". Otherwise, the default value will be used. This was originally used when reloading fields with dependencies, but that resulted in the inibility to set a field with dependencies to be blank and have the dependent fields respond appropriately, so it is no longer in use anywhere. I believe that excludedFields now covers the original use cases without the side-effects of ignoreBlankValues.
+	 *
+	 * @param array $excludedFields - Optional array of field names to exclude pulling input values for. This is used for dependent fields who's values should be reset when they are reloaded, instead of preserving the current value on the screen, whether that be the default value or the value a user entered.
 	 *
 	 */
 	private function pullInputValues($ignoreBlankValues = false, $excludedFields = []) {
@@ -536,7 +538,7 @@ class FormUi extends Ui {
 				$excludedFields[] = $fieldName;
 			}
 		}
-		$this->pullInputValues(true, $excludedFields);
+		$this->pullInputValues(false, $excludedFields);
 
 
 		// Render and return the views for each field we requested

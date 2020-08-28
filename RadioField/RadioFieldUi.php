@@ -5,6 +5,20 @@ class RadioFieldUi extends FieldUi {
     public $cssClass = 'radioField';
 
 	protected function setup() {}
+	
+	public function run() {
+		$this->view->selectedOption = [];
+		if($this->value) {
+			foreach($this->options as $option) {
+				if($option['value'] == $this->value) {
+					$this->view->selectedOption = $option;
+					break;
+				}
+			}
+		}
+
+		return parent::run();
+	}
 
 	public function fieldValidate() {
 		$match = false;
