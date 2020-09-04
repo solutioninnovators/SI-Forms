@@ -13,12 +13,16 @@ class RepeaterFieldUi extends FieldUi {
 	public $showBlankItem = true; // Show a new item right away without having to click the "add" button
     public $itemLimit;  // The number of items allowed to be added
 	public $cssClass = 'repeaterField';
+	public $sortable = false;
+	//public $showSortHandle = false;
 
 	public $children = []; // The items (rows) in the repeater
 
 	private $repeaterItemsConstructed = false;
 	
-	protected function setup() {}
+	protected function setup() {
+		$this->headScripts[] = $this->url . 'Sortable.min.js';
+	}
 
 	/**
 	 * Constructs the appropriate number of fields (repeater items) and updates their values based on the current $this->value array. Uses $this->fieldTemplate as the template for each repeater item.
@@ -35,7 +39,7 @@ class RepeaterFieldUi extends FieldUi {
 				foreach($this->itemTemplate as $subfieldTemplate) {
 					$subfield = clone $subfieldTemplate;
 					$subfieldName = $subfield->name;
-					$subfield->id = $this->id . $repeaterItemIteration . $subfield->id;
+					$subfield->id = $this->id . "__{$repeaterItemIteration}__" . $subfield->id;
 					$subfield->name = $this->name . "[$repeaterItemIteration][$subfieldName]";
 					$subfield->value = $repeaterItemValue[$subfieldName];
 					$subfield->iteration = $repeaterItemIteration;
@@ -48,7 +52,7 @@ class RepeaterFieldUi extends FieldUi {
 			}
 			else { // Single item template
                 $subfield = clone $this->itemTemplate;
-				$subfield->id = $this->id . $repeaterItemIteration;
+				$subfield->id = $this->id . "__{$repeaterItemIteration}__";
 				$subfield->name = $this->name . "[$repeaterItemIteration]";
 				$subfield->value = $repeaterItemValue;
 				$subfield->iteration = $repeaterItemIteration;
@@ -109,7 +113,7 @@ class RepeaterFieldUi extends FieldUi {
 			$repeaterRow = '';
 			foreach($this->itemTemplate as $fieldTemplate) {
 				$newField = clone $fieldTemplate;
-                $newField->id = $this->id . '$' . $newField->name;
+                $newField->id = $this->id . '__$__' . $newField->name;
 				$newField->name = $this->name . "[$][$newField->name]";
 				$newField->disabled = true;
 				$repeaterRow .= $newField->render();
@@ -118,7 +122,7 @@ class RepeaterFieldUi extends FieldUi {
 		}
 		else { // One field per row
 			$template = clone $this->itemTemplate;
-            $template->id = $this->id . '$';
+            $template->id = $this->id . '__$__';
 			$template->name = $this->name . '[$]';
 			$template->disabled = true;
 			$repeaterItemsOut[] = $template->render();
@@ -152,7 +156,7 @@ class RepeaterFieldUi extends FieldUi {
 					$repeaterRow = '';
 					foreach ($this->itemTemplate as $fieldTemplate) {
 						$newField = clone $fieldTemplate;
-						$newField->id = $this->id . $newItemIndex . $newField->id;
+						$newField->id = $this->id . "__{$newItemIndex}__" . $newField->id;
 						$newField->name = $this->name . "[$newItemIndex][$newField->name]";
 						$newField->classes = $newField->classes .= ' repeaterField-newItem';
 						$repeaterRow .= $newField->render();
@@ -161,7 +165,7 @@ class RepeaterFieldUi extends FieldUi {
 				}
 				else { // One field per row
 					$newField = clone $this->itemTemplate;
-					$newField->id = $this->id . $newItemIndex;
+					$newField->id = $this->id . "__{$newItemIndex}__";
 					$newField->name = $this->name . "[$newItemIndex]";
 					$newField->classes = $newField->classes .= ' repeaterField-newItem';
 					$repeaterItemsOut[] = $newField->render();

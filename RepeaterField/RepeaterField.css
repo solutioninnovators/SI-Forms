@@ -16,6 +16,9 @@
     .repeaterField-item {
         position: relative;
     }
+    .repeaterField-item_sortable {
+
+    }
     .repeaterField-field {
         margin-right: 40px;
     }
@@ -24,4 +27,16 @@
         top: 50%;
         right: 0;
         transform: translateY(-50%);
+    }
+
+.grabbable, .grabbable label {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+    .grabbable:active, .grabbable:active label {
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+        cursor: grabbing;
     }

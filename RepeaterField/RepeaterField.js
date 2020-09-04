@@ -1,19 +1,79 @@
 $(function() {
+    var nameRegEx = /\[(\d+|\$)\]/;
+    var idRegEx = /__(\d+|\$)__/;
+
+    init($('.repeaterField'));
+
+    $('body').on('ui-reloaded', '.ui', function(e) {
+        e.stopPropagation();
+        init($(this).find('.repeaterField'));
+    });
+
+    function init($fields) {
+        $fields.each(function() {
+            var list = $(this).find('.repeaterField-items');
+            if(parseInt(list.attr('data-sortable'))) {
+                Sortable.create(list[0], {
+                    animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
+                    //handle: ".repeaterField-sort", // Restricts sort start click/touch to the specified element
+                    onUpdate: function (e) {
+                        var $item = $(e.item); // the current dragged HTMLElement
+
+                        updateIndexes($item.closest('.repeaterField')); // Update repeater indexes
+                        $item.closest('.ui_RepeaterField').trigger('ui-value-changed'); // Trigger value changed event on the repeater
+                    }
+                });
+            }
+        });
+    }
+
     function updateIndexes($repeater) {
-		var items = $repeater.find('.repeaterField-item:not(.repeaterField-template)');
+		var items = $repeater.children('.repeaterField-items').children('.repeaterField-item:not(.repeaterField-template)');
 		var i = 0;
 		items.each(function() {
-			$(this).find('.field-input').each(function() {
-                var $this = $(this);
-				if($this.attr("name")) {
-					var newName = $this.attr("name").replace(/\[(\d+|\$)\]/, '[' + i + ']');
-					$this.attr('name', newName);
-                    $this.closest('.field').attr('data-field-name', newName);
-				}
-			});
+            $repeaterItem = $(this);
+            $fieldUis = $repeaterItem.children('.repeaterField-field').children('.ui'); // Limiting to direct children to potentially allow support for nested repeaters
+
+            // This section will have to be updated if we want to support nesting repeaters
+            $fieldUis.each(function() {
+                $fieldUi = $(this);
+
+                // Find the element(s) in this field with the name attribute (input, select, textarea...) and update it to reflect the new index #
+                reindexAttributes($fieldUi.find('[name]'), 'name', i, 'name');
+
+                // Also update id attributes for these
+                reindexAttributes($fieldUi.find('[id]'), 'id', i, 'id');
+
+                // Update 'for' on the label element
+                reindexAttributes($fieldUi.find('[for]'), 'for', i, 'id');
+
+                // Update data-field-name attribute on the .field element
+                reindexAttributes($fieldUi.find('[data-field-name]'), 'data-field-name', i, 'name');
+            });
+
+            // Update attributes on the Ui wrappers
+            reindexAttributes($fieldUis, 'id', i, 'id');
+            reindexAttributes($fieldUis, 'data-ui-id', i, 'id');
+            // reindexAttributes($fieldUis, 'data-ui-path', i, 'id'); // Updating the path breaks ajax calls on UIs within the newly created items because the item doesn't exist yet on the server. By not updating the path, we route all ajax calls through the template item, which should be sufficient at this time.
+            reindexAttributes($fieldUis, 'class', i, 'id');
+
 			i++;
 		});
 	}
+
+    function reindexAttributes($elements, attr, index, type) {
+        var selector = '[' + attr + ']';
+        $elements.filter(selector).each(function() {
+            var $this = $(this);
+            if(type == 'id') {
+                var newString = $this.attr(attr).replace(idRegEx, '__' + index + '__');
+            }
+            else if(type == 'name') {
+                var newString = $this.attr(attr).replace(nameRegEx, '[' + index + ']');
+            }
+            $this.attr(attr, newString);
+        });
+    }
 
     $('body').on('click', '.repeaterField-addNew', function(e) {
         e.preventDefault();
@@ -59,4 +119,5 @@ $(function() {
             $repeaterParent.trigger('ui-value-changed');
         }
     });
+
 });

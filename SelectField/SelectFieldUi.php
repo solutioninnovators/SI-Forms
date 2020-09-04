@@ -7,8 +7,8 @@ class SelectFieldUi extends FieldUi {
 	
 	protected function setup() {
 		if($this->autocomplete) {
-			$this->headScripts[] = $this->config->urls->templates . 'library/chosen/chosen.jquery.min.js';
-			$this->styles[] = $this->config->urls->templates . 'library/chosen/chosen.min.css';
+			$this->headScripts[] = $this->url . 'chosen/chosen.jquery.min.js';
+			$this->styles[] = $this->url . 'chosen/chosen.min.css';
 		}
 	}
 

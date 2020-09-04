@@ -1,5 +1,5 @@
 $(function() {
-    $('.userChooser-item').not('.userChooser-readOnly').on('click', function() {
+    $('body').on('click', '.userChooser-item:not(.userChooser-readOnly)', function() {
         var $this = $(this);
         var $field = $this.closest('.userChooser');
 
@@ -18,7 +18,9 @@ $(function() {
             $this.find('.userChooser-checkbox').attr('checked', true);
             $this.addClass('userChooser-selected');
         }
+
+        // Trigger ui-value-changed event
+        var valArray = $field.find("input:checked").map(function() { return $(this).val(); }).get();
+        $field.closest('.ui').trigger('ui-value-changed', [{value: valArray}]);
     });
-    
-    // @todo Trigger ui-value-changed event
 });

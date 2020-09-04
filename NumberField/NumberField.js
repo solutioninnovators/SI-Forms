@@ -1,19 +1,19 @@
 $(function() {
-    $('.numberField-up').on('click', function() {
+    $('body').on('click', '.numberField-up', function() {
         var $input = $(this).closest('.numberField').find('input');
         $input.val(incrementNumber($input.val(), 1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
         $input.trigger('number-change'); // @deprecated
     });
 
-    $('.numberField-down').on('click', function() {
+    $('body').on('click', '.numberField-down', function() {
         var $input = $(this).closest('.numberField').find('input');
         $input.val(incrementNumber($input.val(), -1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
         $input.trigger('number-change'); // @deprecated
     });
 
-    $('.numberField input').on('change', function() {
+    $('body').on('change', '.numberField input', function() {
         $(this).val(incrementNumber($(this).val(), 0, $(this) ));
         $input.closest('.ui').trigger('ui-value-changed');
         $input.trigger('number-change'); // @deprecated
@@ -22,7 +22,7 @@ $(function() {
     // Handle long mouse presses
     var interval;
     var timeout;
-    $('.numberField-up, .numberField-down').on('mousedown', function() {
+    $('body').on('mousedown', '.numberField-up, .numberField-down', function() {
         var $button = $(this);
         var increment = 1;
         if($button.hasClass('numberField-down')) increment = -1;
@@ -34,7 +34,7 @@ $(function() {
             }, 100);
         }, 400);
     });
-    $('.numberField-up, .numberField-down').on('mouseup mouseout', function() {
+    $('body').on('mouseup mouseout', '.numberField-up, .numberField-down', function() {
         clearTimeout(timeout);
         clearInterval(interval);
     });

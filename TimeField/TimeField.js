@@ -1,19 +1,19 @@
 $(function() {
-    $('.timeField-up').on('click', function() {
+    $('body').on('click', '.timeField-up', function() {
         var $input = $(this).closest('.timeField').find('input');
         $input.val(incrementTime($input.val(), 1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
         $input.trigger('time-change'); // @deprecated
     });
 
-    $('.timeField-down').on('click', function() {
+    $('body').on('click', '.timeField-down', function() {
         var $input = $(this).closest('.timeField').find('input');
         $input.val(incrementTime($input.val(), -1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
         $input.trigger('time-change'); // @deprecated
     });
 
-    $('.timeField input').on('change', function() {
+    $('body').on('change', '.timeField input', function() {
         var $input = $(this);
         $input.val(incrementTime($(this).val(), 0, $(this) ));
         $input.closest('.ui').trigger('ui-value-changed');
@@ -23,7 +23,7 @@ $(function() {
     // Handle long mouse presses
     var interval;
     var timeout;
-    $('.timeField-up, .timeField-down').on('mousedown', function() {
+    $('body').on('mousedown', '.timeField-up, .timeField-down', function() {
         var $button = $(this);
         var increment = 1;
         if($button.hasClass('timeField-down')) increment = -1;
@@ -35,7 +35,7 @@ $(function() {
             }, 100);
         }, 400);
     });
-    $('.timeField-up, .timeField-down').on('mouseup mouseout', function() {
+    $('body').on('mouseup mouseout', '.timeField-up, .timeField-down', function() {
         clearTimeout(timeout);
         clearInterval(interval);
     });

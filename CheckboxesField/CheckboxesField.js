@@ -7,5 +7,9 @@ $(function() {
         $(this).closest('.checkboxesField').find('input').prop('checked', false);
     });
 
-    // todo: Trigger ui-value-changed event when value changes
+    $('body').on('change', '.checkboxesField input', function() {
+        var $ui = $(this).closest('.ui');
+        var valArray = $ui.find("input:checked").map(function() { return $(this).val(); }).get();
+        $ui.trigger('ui-value-changed', [{value: valArray}]);
+    });
 });

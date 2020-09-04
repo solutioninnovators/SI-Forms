@@ -9,7 +9,7 @@
 			<?php endif ?>
 		</div>
 	<?php else: ?>
-		<select id="input_<?= $sanitizer->entities1($id) ?>" name="<?= $sanitizer->entities1($name) ?>" class="field-input txtBox txtBox_select <?= $autocomplete ? 'selectField-autocomplete' : '' ?>" <?= $disabled ? 'disabled' : '' ?>>
+		<select <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> name="<?= $sanitizer->entities1($name) ?>" class="field-input txtBox txtBox_select <?= $autocomplete ? 'selectField-autocomplete' : '' ?>" <?= $disabled ? 'disabled' : '' ?>>
 			<?php if($placeholder): ?>
 				<option value=""><?= $sanitizer->entities1($placeholder) ?></option>
 			<?php endif ?>

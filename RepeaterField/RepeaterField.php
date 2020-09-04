@@ -3,10 +3,10 @@
 		<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" />
 	<?php endif ?>
 
-	<ul class="repeaterField-items" data-item-limit="<?= $sanitizer->entities1($itemLimit) ?>">
+	<ul class="repeaterField-items" data-item-limit="<?= $sanitizer->entities1($itemLimit) ?>" <?= $sortable ? 'data-sortable="1"' : '' ?>>
 		<?php $i = 0 ?>
 		<?php foreach($repeaterItemsOut as $repeaterItem): ?>
-			<li class="repeaterField-item <?= $i == 0 ? 'repeaterField-template' : '' ?>">
+			<li class="repeaterField-item <?= $i == 0 ? 'repeaterField-template' : '' ?> <?= $sortable && !$readOnly ? 'repeaterField-item_sortable grabbable' : '' ?>">
 				<div class="repeaterField-field gGrid">
 					<?= $repeaterItem ?>
 				</div>

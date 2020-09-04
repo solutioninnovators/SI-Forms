@@ -1,22 +1,18 @@
-/**
- * @todo: prevent chosen call if not using autocomplete.
- */
 $(function() {
-    function init() {
-        var autocomplete = $('.selectField-autocomplete');
-
-        if(autocomplete.length > 0) {
-            $('.selectField-autocomplete').chosen({
+    function init($fields) {
+        if($fields.length > 0) {
+            $fields.chosen({
                 width: "100%"
             });
         }
     }
 
-    init();
+    init($('.selectField-autocomplete'));
 
     // re-initialize on reload
-	$('body').on('ui-reloaded', '*', function(e) {
-		init();
+	$('body').on('ui-reloaded', '.ui', function(e) {
+        e.stopPropagation();
+		init($(this).find('.selectField-autocomplete'));
 	});
 
     $('body').on('change', '.selectField .field-input', function() {

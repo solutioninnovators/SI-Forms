@@ -8,7 +8,7 @@
 			</label>
 
 			<div class="passwordField-inputWrap">
-				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" id="input_<?= $sanitizer->entities1($id) ?>" class="field-input txtBox <?= $sanitizer->entities1($error) ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholder) ?>" />
+				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $sanitizer->entities1($error) ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholder) ?>" />
 
 				<?php if($visibilityToggle): ?>
 					<button type="button" class="passwordField-visibility btn btn_sm tooltip" tabindex="-1" title="Show/hide password"><i class="fa fa-eye"></i></button>
@@ -23,7 +23,7 @@
 					<?php if($required): ?><span class="field-required">*</span><?php endif ?>
 				</label>
 
-				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" id="input_<?= $sanitizer->entities1($id) ?>Confirm" class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholderConfirm) ?>" />
+				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>Confirm"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholderConfirm) ?>" />
 			</div>
 		<?php endif ?>
 	</div>

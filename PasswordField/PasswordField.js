@@ -19,8 +19,6 @@ $(function() {
 
 
     $('body').on('input', '.passwordField .field-input', UiBlocks.debounce(function(e) {
-        console.log('Field changed.');
-
         var $field = $(this).closest('.ui');
         var $inputs = $field.find('.field-input');
 
