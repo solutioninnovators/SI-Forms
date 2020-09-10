@@ -3,20 +3,18 @@ $(function() {
         var $input = $(this).closest('.numberField').find('input');
         $input.val(incrementNumber($input.val(), 1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
-        $input.trigger('number-change'); // @deprecated
     });
 
     $('body').on('click', '.numberField-down', function() {
         var $input = $(this).closest('.numberField').find('input');
         $input.val(incrementNumber($input.val(), -1, $input));
         $input.closest('.ui').trigger('ui-value-changed');
-        $input.trigger('number-change'); // @deprecated
     });
 
     $('body').on('change', '.numberField input', function() {
-        $(this).val(incrementNumber($(this).val(), 0, $(this) ));
+        var $input = $(this);
+        $input.val(incrementNumber($input.val(), 0, $input));
         $input.closest('.ui').trigger('ui-value-changed');
-        $input.trigger('number-change'); // @deprecated
     });
 
     // Handle long mouse presses
