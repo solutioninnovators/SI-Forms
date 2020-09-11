@@ -9,6 +9,7 @@ class PasswordFieldUi extends FieldUi {
     public $labelConfirm = '';
     public $placeholderConfirm = '';
     public $stackInputs = false; // Stack the confirmation input under the first input instead of beside it
+    public $showValue = false;
     public $value = ['',''];
 
     public function fieldValidate() {
