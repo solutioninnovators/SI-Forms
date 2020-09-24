@@ -8,7 +8,7 @@
 
 	<?php if(!$readOnly): ?>
 		<div class="field-input imageField-input">
-			<input type="file" class="<?= $sanitizer->entities1($buttonClasses) ?>" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> />
+			<input type="file" class="<?= $sanitizer->entities1($buttonClasses) ?>" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> <?= $disabled ? 'disabled' : '' ?> />
 		</div>
 	<?php endif ?>
 

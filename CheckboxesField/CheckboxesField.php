@@ -6,7 +6,7 @@
 		</div>
 	<?php endif ?>
 
-	<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" />
+	<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" <?= $disabled ? 'disabled' : '' ?> />
 
 	<ul class="checkboxesField-list <?= $columnize ? 'checkboxesField-columnize' : '' ?>">
 		<?php foreach($options as $option): ?>

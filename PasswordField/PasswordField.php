@@ -18,7 +18,7 @@ class="field <?= $sanitizer->entities1($cssClass) ?>"
 			</label>
 
 			<div class="passwordField-inputWrap">
-				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $sanitizer->entities1($error) ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $showValue ? $sanitizer->entities($value[0]) : '' ?>" />
+				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $sanitizer->entities1($error) ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $showValue ? $sanitizer->entities($value[0]) : '' ?>" <?= $disabled ? 'disabled' : '' ?> />
 
 				<?php if($visibilityToggle): ?>
 					<button type="button" class="passwordField-visibility btn btn_sm tooltip" tabindex="-1" title="Show/hide password"><i class="fa fa-eye"></i></button>
@@ -33,7 +33,7 @@ class="field <?= $sanitizer->entities1($cssClass) ?>"
 					<?php if($required): ?><span class="field-required">*</span><?php endif ?>
 				</label>
 
-				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>Confirm"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholderConfirm) ?>" value="<?= $showValue ? $sanitizer->entities($value[1]) : '' ?>" />
+				<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>Confirm"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="password" placeholder="<?= $sanitizer->entities1($placeholderConfirm) ?>" value="<?= $showValue ? $sanitizer->entities($value[1]) : '' ?>" <?= $disabled ? 'disabled' : '' ?> />
 			</div>
 		<?php endif ?>
 	</div>

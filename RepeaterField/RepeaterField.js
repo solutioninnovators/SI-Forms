@@ -86,7 +86,7 @@ $(function() {
 
         // Get a copy of the hidden template element
         var $newItem = $repeater.find('.repeaterField-template').clone();
-        $newItem.find('.field-input').removeAttr('disabled');
+        $newItem.find('[disabled]').removeAttr('disabled');
         $newItem.removeClass('repeaterField-template').hide();
         $repeater.find('.repeaterField-items').append($newItem);
         $newItem.slideDown(100);
