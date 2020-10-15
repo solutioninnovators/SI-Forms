@@ -20,7 +20,9 @@ $(function() {
                         var $item = $(e.item); // the current dragged HTMLElement
 
                         updateIndexes($item.closest('.repeaterField')); // Update repeater indexes
-                        $item.closest('.ui_RepeaterField').trigger('ui-value-changed'); // Trigger value changed event on the repeater
+                        var $repeaterUi = $item.closest('.ui_RepeaterField');
+                        $repeaterUi.trigger('ui-resorted'); // Trigger value changed event on the repeater when sort order changes
+                        $repeaterUi.trigger('ui-value-changed'); // Trigger value changed event on the repeater when sort order changes
                     }
                 });
             }
@@ -92,7 +94,11 @@ $(function() {
         $newItem.slideDown(100);
 
         updateIndexes($repeater);
-        $newItem.find('.ui').trigger('ui-reloaded');
+        $newItem.find('.ui').trigger('ui-reloaded'); // Trigger reloaded event on the fields in the new item so that they can initialize any javascript that supports them
+
+        var $repeaterUi = $newItem.closest('.ui_RepeaterField');
+        $repeaterUi.trigger('ui-item-added'); // Trigger value changed event on the repeater when sort order changes
+        $repeaterUi.trigger('ui-value-changed'); // Trigger value changed event on the repeater when item is added
     });
 
     $('body').on('click', '.repeaterField-remove', function(e) {
@@ -107,8 +113,11 @@ $(function() {
         var $item = $(this).closest('.repeaterField-item');
         $item.slideUp(100);
         setTimeout(function() {
+            var $repeaterUi = $item.closest('.ui_RepeaterField');
             $item.remove();
             updateIndexes($repeater);
+            $repeaterUi.trigger('ui-item-removed'); // Trigger value changed event on the repeater when sort order changes
+            $repeaterUi.trigger('ui-value-changed'); // Trigger value changed event on the repeater when item is deleted
         }, 100);
     });
 
