@@ -49,7 +49,7 @@ class AutocompleteFieldUi extends FieldUi {
 		$query = "\"$query\""; // Wrap the string in double quotes to prevent injection attacks
 
 		if($this->searchSelectorCallback) {
-			$selector = call_user_func_array($this->searchSelectorCallback, [$query]);
+			$selector = call_user_func_array($this->searchSelectorCallback, [$query, $this, $this->form]);
 		}
 		else {
 			$selector = "{$this->searchSelector}, limit={$this->resultLimit}, q=({$this->searchFields}{$this->searchOperator}{$query})";
