@@ -12,6 +12,7 @@ $(function () {
             var $realField = $this.siblings('.autocompleteField-value');
             var previousValue = $realField.val();
             var $spinner = $this.siblings('.autocompleteField-spinner');
+            var $form = $this.closest('form');
 
             var defaultSettings = {
                 serviceUrl: '',
@@ -21,10 +22,8 @@ $(function () {
                 preventBadQueries: false, // Having this enabled prevents the ID match from working correctly
                 deferRequestBy: 250, // Number of milliseconds to defer Ajax request
                 groupBy: 'category',
-                params: $.extend(queryStringToJSON(), {
-                    ajax: 'getMatches',
-                    ui: $this.closest('.ui').attr('data-ui-path')
-                }),
+                // Combine the current query string, current form data, and ajax request info
+                params: $.extend(queryStringToJSON(), queryStringToJSON($form.serialize()), { ajax: 'getMatches', ui: $this.closest('.ui').attr('data-ui-path')}),
                 onSelect: function (suggestion) {
                     $realField.val(suggestion.data.id); // Copy the selection to the real field
 
@@ -64,13 +63,19 @@ $(function () {
         });
     }
 
-    function queryStringToJSON() {
-        var pairs = location.search.slice(1).split('&');
+    function queryStringToJSON(queryString) {
+        if(queryString === undefined) {
+            queryString = location.search.slice(1);
+        }
+
+        var pairs = queryString.split('&');
 
         var result = {};
         pairs.forEach(function (pair) {
-            pair = pair.split('=');
-            result[pair[0]] = decodeURIComponent(pair[1] || '');
+            if(pair[0]) {
+                pair = pair.split('=');
+                result[pair[0]] = decodeURIComponent(pair[1] || '');
+            }
         });
 
         return JSON.parse(JSON.stringify(result));

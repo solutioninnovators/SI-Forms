@@ -65,7 +65,7 @@ $(function() {
     });
 
     /**
-     * When a field's value changes, reload any of the fields it depends on, while preserving their values
+     * When a field's value changes, reload any of the fields that depend on it, while preserving their values
      */
     $('body').on('ui-value-changed', '.ui', function(e, params) {
         var $field = $(this).find('.field');
@@ -88,9 +88,10 @@ $(function() {
             // Add the form fields to the extra parameters and turn all parameters into a query string
             extraParams = $form.serialize() + '&' + $.param(extraParams);
 
-            // Trigger a reloading event for each of the fields for ohers to pick up on
+            // Trigger a reloading event for each of the fields for others to pick up on
             $fields.each(function() {
                 $(this).closest('.ui').trigger('ui-reloading');
+                $(this).css({opacity: 1}).animate({opacity: 0.5}, 300);
             });
 
             // Get the view for each of the fields we want to reload and plug them in where they belong
