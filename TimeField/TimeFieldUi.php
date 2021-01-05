@@ -5,6 +5,8 @@ class TimeFieldUi extends FieldUi {
 	public $amPm = false; // Uses 12 hour format with am & pm (requires $twentyFourHour == true)
 	public $hideIncrementButtons = false;
 	public $cssClass = 'timeField';
+	public $maxLength;
+	public $minLength;
 	
 	protected function setup() {
 		$this->headScripts[] = "{$this->url}si-time.js";

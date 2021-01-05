@@ -123,7 +123,7 @@ $(function() {
         if(!$field.attr('data-ajax-save') && !$field.attr('data-ajax-validate')) return;
 
         var $form = $fieldUi.closest('form');
-        var $ui = $form.closest('.ui');
+        var $ui = $field.closest('.ui_Form');
         var $saveBadge = $field.find('.field-saveBadge').first(); // First is specified, just in case this is a repeater with fields inside it
         var $spinner = "<i class='fa fa-spin fa-circle-o-notch'></i>";
         var $checkmark = "<i class='fa fa-check-circle'></i>";
