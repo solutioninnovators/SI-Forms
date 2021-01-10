@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.20
+ * @version 1.1.21
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
@@ -223,7 +223,7 @@ class FormUi extends Ui {
 				}
 			}
 
-			if(!$valid) {
+			if(!$valid && !$this->error) {
 				$this->error = __("Please fix the errors indicated below and resubmit the form.");
 			}
 			elseif($this->legacyMode && $this->method == 'post') {
