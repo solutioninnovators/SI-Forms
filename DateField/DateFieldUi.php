@@ -2,8 +2,8 @@
 class DateFieldUi extends FieldUi {
 
 	public $cssClass = 'dateField';
-	public $jsDateFormat = 'YYYY-MM-DD';
-	public $phpDateFormat = 'Y-m-d';
+	public $jsDateFormat = 'YYYY/MM/DD'; // YYYY-MM-DD Doesn't seem to work with the current version of Pikaday
+	public $phpDateFormat = 'Y/m/d';
 	public $maxLength;
 
 	public function setup() {
