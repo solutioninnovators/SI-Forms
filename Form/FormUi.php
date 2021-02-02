@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.22
+ * @version 1.1.23
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  *
@@ -26,6 +26,7 @@ class FormUi extends Ui {
 	public $sessionStorage = false; // Enable automatic storage and retrieval of field values in the session
 	public $error; // Holds an error set by the form after validate() is called
 	public $ajaxSubmit = false; // Should the form be submitted via ajax? (avoids refreshing the page)
+	public $noSubmit = false; // Prevent the form from submitting (Useful if all fields in the form are set to ajaxSave)
 	public $savePage; // Optional ProcessWire page field to automatically save values to on a successful form submission (used for fields where $savePage is not set on the field itself)
 	public $validateCallback; // Additional validation to run after the individual fields are validated and before the success callback. Should return true|false. You may also return an error string.
 	public $successCallback; // Callback method to process the form data after successful validation

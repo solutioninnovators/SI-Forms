@@ -1,5 +1,12 @@
 $(function() {
     /**
+     * Prevent form from submitting if $noSubmit is set to true
+     */
+    $('body').on('submit', 'form[data-no-submit="1"]', function(e) {
+        e.preventDefault();
+    });
+
+    /**
      * Submit the entire form via ajax
      */
     $('body').on('submit', 'form[data-ajax-submit="1"]', function(e) {

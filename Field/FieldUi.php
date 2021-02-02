@@ -23,7 +23,7 @@ abstract class FieldUi extends Ui {
 	public $filterCallback; // Set a callback function to get called before validation to filter/sanitize the value
 	public $validateCallback; // Set a callback function to get called after the default validation
 	public $validateOverride = false; // Skip the field's standard validation logic and only run the validateCallback
-	public $saveCallback; // Set a callback to run in place of the default save procedure. Must return true or false.
+	public $saveCallback; // Set a callback to run in place of the default save procedure. Should return the value to be saved. If necessary you may also save the field within the callback and return null, though this is less efficient than allowing the Form to manage the save.
 	
 	public $classes;
 	public $__placeholder = '';
