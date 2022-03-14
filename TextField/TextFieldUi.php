@@ -7,7 +7,7 @@ class TextFieldUi extends FieldUi {
 	public $honeypot = false; // Is this a honeypot field?
 
 	public function filter() {
-		$this->value = $this->sanitizer->text($this->value, array('maxLength' => 0));
+		$this->value = $this->sanitizer->text($this->value, array('maxLength' => 0, 'trim' => false));
 	}
 
 	public function fieldValidate() {

@@ -1,4 +1,10 @@
-<div class="field buttonField <?= $fullWidth ? 'buttonField_fullWidth' : '' ?>">
+<div
+	class="field buttonField<?= $fullWidth ? ' buttonField_fullWidth' : '' ?>"
+	data-field-name="<?= $sanitizer->entities1($name) ?>"
+	<?php if(count($dependsOn)): ?>
+		data-depends-on="<?= $sanitizer->entities1(implode(' ', $dependsOn)) ?>"
+	<?php endif ?>
+>
 	<?php if($href): ?>
 		<a class="btn <?= $sanitizer->entities1($btnClasses) ?>" href="<?= $sanitizer->entities1($href) ?>" <?= $sanitizer->entities1($attributeString) ?>>
 			<?php if($icon): ?>

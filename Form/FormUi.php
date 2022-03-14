@@ -1,9 +1,10 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.23
+ * @version 1.1.24
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
+ * Call process() instead of render() on the form block to return an array of the processed and rendered header, footer, and fields instead of a single rendered view of the entire form. See the return value of the run() method for details.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
@@ -159,10 +160,42 @@ class FormUi extends Ui {
 				$this->processNonSubmit();
 			}
 		}
-		
+
+		$wrapperHeader = $this->getWrapperHeader();
+		$wrapperFooter = $this->getWrapperFooter();
+		$formHeader = $this->getFormHeader();
+		$formFooter = $this->getFormFooter();
+
 		return [
-			'fieldsOut' => $this->renderFields() // Render the html for the fields
+			'wrapperHeader' => $wrapperHeader,
+			'wrapperFooter' => $wrapperFooter,
+			'formHeader' => $formHeader,
+			'formFooter' => $formFooter,
+			'header' => $wrapperHeader . $formHeader,
+			'footer' => $wrapperFooter . $formFooter,
+			'fields' => $this->renderFields(),
 		];
+
+		return $return;
+	}
+
+	protected function getFormHeader() {
+		$id = $this->sanitizer->entities1($this->id);
+		$formClasses = $this->sanitizer->entities1($this->formClasses);
+		$method = $this->sanitizer->entities1($this->method);
+		$action = $this->action ? "action='{$this->action}'" : '';
+		$target = $this->sanitizer->entities1($this->target);
+		$name = $this->name ? "name='{$this->sanitizer->entities1($this->name)}'" : '';
+		$autocomplete = $this->sanitizer->entities1($this->autocomplete);
+		$ajaxSubmit = $this->ajaxSubmit ? 'data-ajax-submit=1' : '';
+		$noSubmit = $this->noSubmit ? 'data-no-submit=1' : '';
+		$novalidate = $this->novalidate ? 'novalidate' : '';
+
+		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate>";
+	}
+
+	protected function getFormFooter() {
+		return '</form>';
 	}
 
 	/**
@@ -370,9 +403,15 @@ class FormUi extends Ui {
 	public function renderFields() {
 		$this->sortFieldsByIndex();
 
-		$fieldsOut = '';
+		$fieldsOut = [];
+		if($this->noSubmit === false) {
+			$fieldsOut['hiddenSubmit'] = "<input type='hidden' name='form_{$this->sanitizer->entities1($this->id)}' value='1' />";
+		}
 		foreach($this->fields() as $field) {
-			$fieldsOut .= $field->render();
+            $fieldsOut[$field->name] = $field->render();
+        }
+		if($this->method == 'post' && !$this->disableCSRF) {
+			$fieldsOut['csrf'] = $this->session->CSRF->renderInput();
 		}
 		return $fieldsOut;
 	}

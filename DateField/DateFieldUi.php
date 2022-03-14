@@ -5,6 +5,8 @@ class DateFieldUi extends FieldUi {
 	public $jsDateFormat = 'YYYY/MM/DD'; // YYYY-MM-DD Doesn't seem to work with the current version of Pikaday
 	public $phpDateFormat = 'Y/m/d';
 	public $maxLength;
+	public $minDate;
+    public $maxDate;
 
 	public function setup() {
 		$this->headScripts[] = $this->config->urls->templates . "library/moment.min.js"; // Including moment.js enables additional date format options in pikaday
