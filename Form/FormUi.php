@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.1.25
+ * @version 1.2
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  * Call process() instead of render() on the form block to return an array of the processed and rendered header, footer, and fields instead of a single rendered view of the entire form. See the return value of the run() method for details.

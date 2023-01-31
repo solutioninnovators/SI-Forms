@@ -7,47 +7,22 @@
  *
  * To save the field after validation, call saveFileToPage()
  *
- * Note that unlike other html input types, html file inputs cannot be pre-populated with a value, so we cannot repopulate the field for the user if there is an error during the form save.
+ * IMPORTANT: Note that unlike other html input types, html file inputs cannot be pre-populated with a current value. This means we cannot repopulate the field for the user if there is an error during the form save. Instead, this field uses $this->savePage and $this->saveField to sync its current state with the database value. Don't provide it with an initial value.
  *
+ *  @todo: This field does not support ajax submit/save
  */
-class ImageFieldUi extends FieldUi {
-	public $maxSize = 5242880; // Size in Bytes
+class ImageFieldUi extends FileFieldUi {
+	public $maxSize = 20971520; // Size in Bytes
 	public $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
 	public $imgPreview = true;
 	public $type = 'file'; // Tells the FormUI how to handle this field
 	public $maxWidth = 800;
 	public $maxHeight = 800;
+    public $multiple = false;
 	public $savePage = null;
 	public $saveField = null;
 	public $buttonClasses = '';
 	public $cssClass = 'imageField';
-
-	public function isPopulated() {
-		if($this->value['tmp_name']) {
-			return true;
-		}
-		return false;
-	}
-
-	public function fieldValidate() {
-		$value = $this->value;
-
-		$ext = strtolower(pathinfo($value['name'], PATHINFO_EXTENSION)); // Get file extension
-
-		if($value['size'] > $this->maxSize) {
-			$this->error = __('File size must be less than ') . $this->maxSize . __(' bytes.');
-		}
-		elseif(!in_array($ext, $this->allowedExt)) {
-			$allowedExtString = implode(', ', $this->allowedExt);
-			$this->error = __("File must be one of the following: ") . $allowedExtString;
-		}
-		elseif($value['error']) {
-			$this->error = __("Upload error");
-		}
-
-		if($this->error) return false;
-		else return true;
-	}
 
 	/**
 	 * Call this after validating your form to save the validated image to the page specified by the $pageSave property.
@@ -118,5 +93,4 @@ class ImageFieldUi extends FieldUi {
 		}
 		else return true;
 	}
-
 }
