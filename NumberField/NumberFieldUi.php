@@ -6,6 +6,7 @@ class NumberFieldUi extends FieldUi {
 	public $max;
 	public $min;
 	public $maxLength;
+    public $removeButtons;
 
 	public function fieldValidate() {
 

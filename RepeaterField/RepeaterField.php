@@ -1,6 +1,6 @@
 <?php include('../Field/header.php') ?>
 	<?php if(!$readOnly): ?>
-		<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" />
+		<input <?= $formAttribute ?> type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" />
 	<?php endif ?>
 
 	<ul class="repeaterField-items" data-item-limit="<?= $sanitizer->entities1($itemLimit) ?>" <?= $sortable ? 'data-sortable="1"' : '' ?>>

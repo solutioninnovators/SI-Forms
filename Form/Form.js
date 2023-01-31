@@ -1,4 +1,30 @@
 $(function() {
+
+    /**
+     * Get the form this field belongs to. If no form attribute is specified on the field, find the closest form element containing the field.
+     * @param $field - Either the ui wrapper or the outer field div jQuery object
+     */
+    function getFormFromField($field) {
+        var $input = $field.find('.field-input');
+        var $form = [];
+
+        if($input.length) {
+            var formEl = $input[0].form;
+
+            if($('form#' + formEl.id).length > 1) {
+                console.log('There is more than one form with the id of "' + formEl.id + '". This id should be made unique.');
+            }
+
+            $form = $(formEl);
+        }
+
+        if(!$form.length) {
+            $form = $field.closest('form');
+        }
+
+        return $form;
+    }
+
     /**
      * Prevent form from submitting if $noSubmit is set to true
      */
@@ -13,7 +39,7 @@ $(function() {
         e.preventDefault();
 
         var $form = $(this);
-        var $ui = $form.closest('.ui');
+        var $ui = $form.closest('.ui_Form');
 
         $.ajax({
             type: $form.attr('method'),
@@ -62,6 +88,11 @@ $(function() {
                 }
                 else {
                     $ui.trigger('ui-success', [data]); // Allow other js to pick up on the success event
+
+                    // Reset changed class
+                    if($form.attr('data-track-unsaved-changes')) {
+                        $ui.find('field').removeClass('field_changed');
+                    }
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -77,7 +108,7 @@ $(function() {
     $('body').on('ui-value-changed', '.ui', function(e, params) {
         var $field = $(this).find('.field');
         var fieldName = $field.attr('data-field-name');
-        var $form = $field.closest('form');
+        var $form = getFormFromField($field);
 
         // Find all the fields that depend on this one
         var $fields = $(".field[data-depends-on~='" + fieldName + "']");
@@ -129,8 +160,8 @@ $(function() {
         // @todo: Change to data-ajax-submit?
         if(!$field.attr('data-ajax-save') && !$field.attr('data-ajax-validate')) return;
 
-        var $form = $fieldUi.closest('form');
-        var $ui = $field.closest('.ui_Form');
+        var $form = getFormFromField($field);
+        var $ui = $form.closest('.ui_Form');
         var $saveBadge = $field.find('.field-saveBadge').first(); // First is specified, just in case this is a repeater with fields inside it
         var $spinner = "<i class='fa fa-spin fa-circle-o-notch'></i>";
         var $checkmark = "<i class='fa fa-check-circle'></i>";
@@ -157,6 +188,12 @@ $(function() {
                     if (data.saved) {
                         $fieldUi.trigger('ui-validated', [value]);
                         $fieldUi.trigger('ui-saved', [value]);
+
+                        // Reset changed class
+                        if($form.attr('data-track-unsaved-changes')) {
+                            $field.removeClass('field_changed');
+                        }
+
                         console.log('Save successful.');
 
                         $saveBadge.html($checkmark);
@@ -204,5 +241,24 @@ $(function() {
             }
         });
     });
-    
+
+    /**
+     * When a field's value changes, add the changed class
+     */
+    $('body').on('ui-value-changed', '.ui', function(e, params) {
+        var $form = getFormFromField($(this));
+        if($form.attr('data-track-unsaved-changes')) {
+            $(this).find('.field').addClass('field_changed');
+            if($form.attr('data-warn-unsaved-changes')) {
+                window.onbeforeunload = function () { return true; }; // Alert the user if they try to navigate away with unsaved changes
+            }
+        }
+    });
+
+    $('body').on('submit', 'form', function() {
+        if($(this).attr('data-warn-unsaved-changes')) {
+            window.onbeforeunload = null; // Clear unsaved changes alert
+        }
+    });
+
 });

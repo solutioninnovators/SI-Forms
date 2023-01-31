@@ -14,6 +14,7 @@ class RepeaterFieldUi extends FieldUi {
     public $itemLimit;  // The number of items allowed to be added
 	public $cssClass = 'repeaterField';
 	public $sortable = false;
+    public $noRemove = false;
 	//public $showSortHandle = false;
 
 	public $children = []; // The items (rows) in the repeater

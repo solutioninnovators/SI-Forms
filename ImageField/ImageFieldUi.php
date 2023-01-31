@@ -21,20 +21,16 @@ class ImageFieldUi extends FieldUi {
 	public $saveField = null;
 	public $buttonClasses = '';
 	public $cssClass = 'imageField';
-	
+
+	public function isPopulated() {
+		if($this->value['tmp_name']) {
+			return true;
+		}
+		return false;
+	}
+
 	public function fieldValidate() {
 		$value = $this->value;
-
-		//@todo: move to proper place
-		if(!$value['tmp_name']) {
-			if(!$this->required) {
-				return true;
-			}
-			else {
-				$this->error = __("Required");
-				return false;
-			}
-		}
 
 		$ext = strtolower(pathinfo($value['name'], PATHINFO_EXTENSION)); // Get file extension
 

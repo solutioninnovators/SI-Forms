@@ -1,11 +1,26 @@
-.userChooser {}
+.userChooserField {
+    position: relative;
+}
+
+.userChooser {
+    display: flex;
+    flex-wrap: wrap;
+}
+    .userChooser-placeholder {
+        background: #ccc;
+        margin: 2px;
+        color: #999;
+    }
+        .userChooser-placeholder:hover, .userChooser-placeholder:focus {
+            background: #aaa;
+            color: #777;
+        }
     .userChooser-item {
         position: relative;
-        padding: 2px;
+        padding: 1px;
         cursor: pointer;
-        opacity: .3;
+        opacity: .5;
         transition: .3s opacity;
-        width: 75px;
     }
         .userChooser-item.userChooser-readOnly {
             cursor: default;
@@ -33,4 +48,30 @@
         color: #fff;
         right:6px; bottom:2px;
         font-weight: bold;
+    }
+.userChooser_useDropDown {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    min-width: 4rem;
+}
+    .userChooser_useDropDown:not(.userChooser_open) .userChooser-img {
+        border: none;
+    }
+    .userChooser_useDropDown .userChooser-item:not(.userChooser-selected) {
+        display: none;
+    }
+.userChooser_open {
+    position: absolute;
+    justify-content: flex-start;
+    top: 0;
+    right: 0;
+    padding-right: 2px;
+    /*width: 8.3rem;*/
+    /*flex-wrap: wrap;*/
+    background: #333;
+    box-shadow: 0 0 10px rgba(0,0,0,.25);
+    z-index: 9999;
+}
+    .userChooser_open .userChooser-item:not(.userChooser-selected) {
+        display: block;
     }

@@ -2,13 +2,17 @@ $(function() {
     init($('.multipleSelectField-select'));
 
     function init($fields) {
-        $fields.multipleSelect({
-            onClick: function () {
-                $(this).closest('.ui').trigger('ui-value-changed');
-            },
-            onOptgroupClick: function () {
-                $(this).closest('.ui').trigger('ui-value-changed');
-            }
+        $fields.each(function() {
+            var $this = $(this);
+            var $ui = $this.closest('.ui');
+            $this.multipleSelect({
+                onClick: function () {
+                    $ui.trigger('ui-value-changed');
+                },
+                onOptgroupClick: function () {
+                    $ui.trigger('ui-value-changed');
+                }
+            });
         });
     }
 

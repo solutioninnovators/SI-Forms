@@ -25,7 +25,7 @@ abstract class FieldUi extends Ui {
 	public $validateOverride = false; // Skip the field's standard validation logic and only run the validateCallback
 	public $saveCallback; // Set a callback to run in place of the default save procedure. Should return the value to be saved. If necessary you may also save the field within the callback and return null, though this is less efficient than allowing the Form to manage the save.
 	
-	public $classes;
+	public $__classes;
 	public $__placeholder = '';
 	public $__disabled = false;
 	public $ajaxValidate = false; // Validate the field with ajax (but don't save)
@@ -34,14 +34,14 @@ abstract class FieldUi extends Ui {
 	public $saveField; // Optional ProcessWire Field name - if different from this UI's name property (used for AJAX saves)
 	public $__icon = '';
 	public $__label = '';
-	public $showLabel = true;
+	public $__showLabel = true;
 	public $__required = false;
 	public $__description = ''; // Text that appears before field
 	public $__notes = ''; // Text that appears below field
 	public $__inputClasses = '';
 	public $__readOnly = false; // Set to true to display the value of the field while preventing modification or posting to the form
-	public $autofocus = false; // Set focus to this field when the page loads
-	public $autocomplete = false; // Turn on/off browser autocomplete functionality
+	public $__autofocus = false; // Set focus to this field when the page loads
+	public $__autocomplete = false; // Turn on/off browser autocomplete functionality
 	public $__show = true; // Should the field be shown or hidden? (for field dependencies)
 	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (if field dependency logic requires fields to be defined in an order that is different from their display order)
 	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper @todo: Change to fieldAttributes
@@ -280,6 +280,8 @@ abstract class FieldUi extends Ui {
 		if(!$this->show) {
 			$this->wrapperAttributes['style'] = 'display:none;';
 		}
+
+		$this->view->formAttribute = $this->form && !$this->form->legacyMode && $this->form->id ? 'form="'.$this->form->id.'"' : '';
 	}
 
 	/**

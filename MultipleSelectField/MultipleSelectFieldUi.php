@@ -3,6 +3,7 @@ class MultipleSelectFieldUi extends FieldUi {
 	public $value = [];
 	public $__options = []; // Each option expects a label and a value
 	public $cssClass = 'multipleSelectField';
+    public $minimumCountSelected;
 
 	protected function setup() {
 		$this->styles[] = $this->url . 'multiple-select/multiple-select.css';
@@ -29,4 +30,18 @@ class MultipleSelectFieldUi extends FieldUi {
 		if($this->error) return false;
 		else return true;
 	}
+
+    public function run() {
+        $selectedLabel[] = null;
+        foreach($this->options as $option) {
+            if(in_array($option['value'], $this->value)) {
+                $selectedLabel[] = $option['label'];
+                //break;
+            }
+        }
+        $this->view->selectedLabel = substr(implode(', ', $selectedLabel), 2); // Always adds ', ' in front of string even when checking if label and/or value are null
+
+        return parent::run();
+    }
+
 }

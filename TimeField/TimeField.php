@@ -10,7 +10,7 @@
 		</div>
 	<?php else: ?>
 		<div class="timeField-outer">
-			<input maxlength="<?= $sanitizer->entities1($maxLength) ?>" size="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="text" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $sanitizer->entities1($value) ?>" data-twentyfourhour="<?= $sanitizer->entities1($twentyFourHour) ?>" data-ampm="<?= $sanitizer->entities1($amPm) ?>" <?= $disabled ? 'disabled' : '' ?> autocomplete="off" />
+			<input <?= $formAttribute ?> maxlength="<?= $sanitizer->entities1($maxLength) ?>" size="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="text" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $sanitizer->entities1($value) ?>" data-twentyfourhour="<?= $sanitizer->entities1($twentyFourHour) ?>" data-ampm="<?= $sanitizer->entities1($amPm) ?>" <?= $disabled ? 'disabled' : '' ?> autocomplete="off" />
 
 			<?php if(!$hideIncrementButtons): ?>
 				<button type="button" class="timeField-down" tabindex="-1"><i class="fa fa-caret-down"></i></button>

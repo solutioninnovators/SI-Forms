@@ -28,7 +28,7 @@ class FormUi extends Ui {
 	public $error; // Holds an error set by the form after validate() is called
 	public $ajaxSubmit = false; // Should the form be submitted via ajax? (avoids refreshing the page)
 	public $noSubmit = false; // Prevent the form from submitting (Useful if all fields in the form are set to ajaxSave)
-	public $savePage; // Optional ProcessWire page field to automatically save values to on a successful form submission (used for fields where $savePage is not set on the field itself)
+	public $savePage; // Optional ProcessWire page to automatically save values to on a successful form submission (used for fields where $savePage is not set on the field itself)
 	public $validateCallback; // Additional validation to run after the individual fields are validated and before the success callback. Should return true|false. You may also return an error string.
 	public $successCallback; // Callback method to process the form data after successful validation
 	public $errorCallback; // Callback to run if the validation was unsuccessful
@@ -36,6 +36,8 @@ class FormUi extends Ui {
 	public $legacyMode = false; // Allows older implementations of SI Form (prior to the use of the successCallback and errorCallback) to function properly without having to make any changes to the implementation
 	public $sessionValuesPulled = false; // For use with $legacyMode only
 	public $alwaysProcess = false; // Should the form undergo validation/processing every time it is rendered, even if the user didn't submit it? For example, a search form that should perform the search on every page load, regardless of whether the user submitted it.
+	public $trackUnsavedChanges = false; // Adds the css class "field_changed" if a field has changed on the page.
+	public $warnUnsavedChanges = false; // Show the browser's unsaved changes warning dialog box if user tries to leave a page with unsaved changes? (requires $trackUnsavedChanges = true)
 
 	// Regions inside the form tags that may be populated with html
 	public $beforeForm = '';
@@ -190,8 +192,10 @@ class FormUi extends Ui {
 		$ajaxSubmit = $this->ajaxSubmit ? 'data-ajax-submit=1' : '';
 		$noSubmit = $this->noSubmit ? 'data-no-submit=1' : '';
 		$novalidate = $this->novalidate ? 'novalidate' : '';
+		$trackUnsavedChanges = $this->trackUnsavedChanges ? 'data-track-unsaved-changes=1' : '';
+		$warnUnsavedChanges = $this->warnUnsavedChanges ? 'data-warn-unsaved-changes=1' : '';
 
-		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate>";
+		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate $trackUnsavedChanges $warnUnsavedChanges>";
 	}
 
 	protected function getFormFooter() {

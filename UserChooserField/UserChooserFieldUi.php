@@ -5,14 +5,16 @@
  * 
  * Progressively enhances a list of checkboxes with user pictures
  *
- * @todo: Use <label> tag to make field work without needing js?
- * 
  */
 class UserChooserFieldUi extends FieldUi {
 
 	public $__options; // PageArray
+	public $cssClass = 'userChooserField';
 	public $value = [];
 	public $singular = false; // Only allows selection of a single user
+	public $thumbnailSize = 75;
+	public $showInitials = true;
+	public $useDropDown = false;
 
 	public function fieldValidate() {
 		if($this->required && !count($this->value)) {
@@ -32,5 +34,9 @@ class UserChooserFieldUi extends FieldUi {
 		
 		if($this->error) return false;
 		else return true;
+	}
+
+	protected function fieldSave() {
+		return $this->wire->pages->getById($this->value);
 	}
 }

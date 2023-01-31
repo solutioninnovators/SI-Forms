@@ -1,9 +1,9 @@
 <?php include('../Field/header.php') ?>
 
-	<input type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="0" <?= $disabled ? 'disabled' : '' ?> />
+	<input <?= $formAttribute ?> type="hidden" class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="0" <?= $disabled ? 'disabled' : '' ?> />
 
 	<label class="checkboxField-label <?= $toggleSwitch ? 'toggleSwitch' : '' ?>">
-		<input type="checkbox" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> value="1" <?= $value == 1 ? 'checked="checked"' : '' ?> <?= $disabled ? 'disabled' : '' ?> />
+		<input <?= $formAttribute ?> type="checkbox" class="field-input" name="<?= $sanitizer->entities1($name) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> value="1" <?= $value == 1 ? 'checked="checked"' : '' ?> <?= $disabled ? 'disabled' : '' ?> />
 		<?php if($toggleSwitch): ?>
 			<span class="toggleSwitch-slider"></span>
 		<?php endif ?>
