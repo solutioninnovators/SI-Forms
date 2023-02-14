@@ -5,14 +5,18 @@ $(function() {
         $fields.each(function() {
             var $this = $(this);
             var $ui = $this.closest('.ui');
-            $this.multipleSelect({
+            console.log($this.attr('data-settings'));
+            const defaultSettings = {
                 onClick: function () {
                     $ui.trigger('ui-value-changed');
                 },
                 onOptgroupClick: function () {
                     $ui.trigger('ui-value-changed');
                 }
-            });
+            }
+            var customSettings = $.parseJSON($this.attr('data-settings'));
+            var settings = $.extend(defaultSettings, customSettings);
+            $this.multipleSelect(settings);
         });
     }
 

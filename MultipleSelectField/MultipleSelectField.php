@@ -12,7 +12,7 @@
         </div>
     <?php else: ?>
 
-        <select <?= $formAttribute ?> class="field-input multipleSelectField-select" multiple="multiple" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> <?= $disabled ? 'disabled' : '' ?>>
+        <select <?= $formAttribute ?> class="field-input multipleSelectField-select" multiple="multiple" name="<?= $sanitizer->entities1($name) ?>[]" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> data-settings="<?= $sanitizer->entities1(json_encode($settings)) ?>" <?= $disabled ? 'disabled' : '' ?>>
             <?php foreach($options as $option): ?>
                 <option value="<?= $sanitizer->entities1($option['value']) ?>" <?= in_array($option['value'], $value) ? 'selected="selected"' : '' ?>><?= $sanitizer->entities1($option['label']) ?></option>
             <?php endforeach ?>

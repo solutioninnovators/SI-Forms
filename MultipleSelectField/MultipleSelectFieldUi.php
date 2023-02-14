@@ -4,6 +4,7 @@ class MultipleSelectFieldUi extends FieldUi {
 	public $__options = []; // Each option expects a label and a value
 	public $cssClass = 'multipleSelectField';
     public $minimumCountSelected;
+    public $settings = []; // Array for setting up multiple-select.js module.
 
 	protected function setup() {
 		$this->styles[] = $this->url . 'multiple-select/multiple-select.css';
@@ -44,4 +45,7 @@ class MultipleSelectFieldUi extends FieldUi {
         return parent::run();
     }
 
+    public function fieldSave() {
+		return $this->wire->pages->getById($this->value);
+	}
 }
