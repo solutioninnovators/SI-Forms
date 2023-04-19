@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.3
+ * @version 1.3.1
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
  * Call process() instead of render() on the form block to return an array of the processed and rendered header, footer, and fields instead of a single rendered view of the entire form. See the return value of the run() method for details.
@@ -194,8 +194,10 @@ class FormUi extends Ui {
 		$novalidate = $this->novalidate ? 'novalidate' : '';
 		$trackUnsavedChanges = $this->trackUnsavedChanges ? 'data-track-unsaved-changes=1' : '';
 		$warnUnsavedChanges = $this->warnUnsavedChanges ? 'data-warn-unsaved-changes=1' : '';
+		$hiddenSubmit = $this->noSubmit === false ? "<input type='hidden' name='form_{$this->sanitizer->entities1($this->id)}' value='1' />" : '';
+		$csrf = ($this->method == 'post' && !$this->disableCSRF) ? $this->session->CSRF->renderInput() : '';
 
-		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate $trackUnsavedChanges $warnUnsavedChanges>";
+		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate $trackUnsavedChanges $warnUnsavedChanges> $hiddenSubmit $csrf";
 	}
 
 	protected function getFormFooter() {
@@ -408,15 +410,10 @@ class FormUi extends Ui {
 		$this->sortFieldsByIndex();
 
 		$fieldsOut = [];
-		if($this->noSubmit === false) {
-			$fieldsOut['hiddenSubmit'] = "<input type='hidden' name='form_{$this->sanitizer->entities1($this->id)}' value='1' />";
-		}
 		foreach($this->fields() as $field) {
             $fieldsOut[$field->name] = $field->render();
         }
-		if($this->method == 'post' && !$this->disableCSRF) {
-			$fieldsOut['csrf'] = $this->session->CSRF->renderInput();
-		}
+
 		return $fieldsOut;
 	}
 

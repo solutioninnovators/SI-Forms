@@ -15,7 +15,7 @@
 			<?php endif ?>
 
 			<?php foreach($options as $option): ?>
-				<option value="<?= $sanitizer->entities1($option['value']) ?>" <?= $value == $option['value'] ? 'selected="selected"' : '' ?>><?= $sanitizer->entities1($option['label']) ?></option>
+				<option value="<?= $sanitizer->entities1($option['value']) ?>" <?= $value == $option['value'] ? 'selected="selected"' : '' ?> <?= !empty($option['disabled']) ? 'disabled' : '' ?>><?= $sanitizer->entities1($option['label']) ?></option>
 			<?php endforeach ?>
 		</select>
 	<?php endif ?>

@@ -3,6 +3,7 @@
 class ButtonFieldUi extends FieldUi {
 	public $__href = ''; // Specifying an href will cause the button to be created as an <a> link rather than html <button>
 	public $type = 'submit'; // e.g. button, reset, or submit (use 'button' for js-only buttons)
+	public $__disabled = [];
 	public $attributes = []; // Any additional html attributes to include on the button
 	public $btnClasses = '';
 	public $fullWidth = false;

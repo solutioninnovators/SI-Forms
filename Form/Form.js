@@ -129,7 +129,7 @@ $(function() {
             // Trigger a reloading event for each of the fields for others to pick up on
             $fields.each(function() {
                 $(this).closest('.ui').trigger('ui-reloading');
-                $(this).css({opacity: 1}).animate({opacity: 0.5}, 300);
+                $(this).css({opacity: 1, 'pointer-events': 'none'}).animate({opacity: 0.5}, 300);
             });
 
             // Get the view for each of the fields we want to reload and plug them in where they belong
