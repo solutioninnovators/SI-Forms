@@ -39,8 +39,8 @@ $(function () {
                     $spinner.hide();
                 },
             };
+            var customSettings =  $this.data('settings');
 
-            var customSettings = $.parseJSON($this.attr('data-settings'));
             var settings = $.extend(defaultSettings, customSettings);
 
             $this.autocomplete(settings);

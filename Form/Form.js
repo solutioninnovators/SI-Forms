@@ -34,18 +34,20 @@ $(function() {
 
     /**
      * Submit the entire form via ajax
+     * @todo: Use UiBlocks.ajax method instead of $.ajax
      */
     $('body').on('submit', 'form[data-ajax-submit="1"]', function(e) {
         e.preventDefault();
 
         var $form = $(this);
         var $ui = $form.closest('.ui_Form');
+        var ajaxSubmitMethod = $form.attr('data-ajax-submit-method');
 
-        $.ajax({
+        // build AJAX options here, which will later be passed to the ajax function below
+        var ajaxOptions = {
             type: $form.attr('method'),
             url: $ui.closest('.ui[data-ui-url]').attr('data-ui-url'), // Use url from the closest UI block with the data-ui-url attribute set, otherwise use current page url
             dataType: 'json',
-            data: $form.serialize() + '&' + $.param({ui: $ui.attr('data-ui-path'), ajax: 'submit'}),
             success: function(data) {
                 $ui.trigger('ui-submitted', [data]); // Allow other js to pick up on the submitted event
 
@@ -91,15 +93,46 @@ $(function() {
 
                     // Reset changed class
                     if($form.attr('data-track-unsaved-changes')) {
-                        $ui.find('field').removeClass('field_changed');
+                        $ui.find('.field').removeClass('field_changed');
                     }
                 }
             },
-            error: function (xhr, textStatus, errorThrown) {
-                alert('Form could not be submitted due to a network error. You may have been logged out due to inactivity. Please reload the page and try again.');
-                console.log('Error: ' + textStatus + ' ' + errorThrown);
+            // Allow a global ajax handler to take over when there is an error
+            // error: function (xhr, textStatus, errorThrown) {
+            //     alert('Form could not be submitted due to a network error. You may have been logged out due to inactivity. Please reload the page and try again.');
+            //     console.log('Error: ' + textStatus + ' ' + errorThrown);
+            // }
+        }
+
+        // Determine which submit button was clicked and add it to the extra data parameters, since $form.serialize() won't
+        var clickedButton = $(document.activeElement);
+
+        // build data either via using jQuery serialize or using the FormData
+        // NOTE: older browsers like IE<10 doesn't support FormData
+        var data;
+        if(ajaxSubmitMethod === 'formdata') {
+            data = new FormData($form[0]);
+            data.append('ui', $ui.attr('data-ui-path'));
+            data.append('ajax', 'submit');
+            if(clickedButton.is('[type="submit"]')) {
+                data.append(clickedButton.attr('name'), clickedButton.val());
             }
-        });
+
+            // IMPORTANT: otherwise the data will be treated as string
+            ajaxOptions.processData = false;
+            ajaxOptions.contentType = false;
+        }
+        else {
+            var extraData = {ui: $ui.attr('data-ui-path'), ajax: 'submit'};
+            if(clickedButton.is('[type="submit"]')) {
+                extraData[clickedButton.attr('name')] = clickedButton.val();
+            }
+            data = $form.serialize() + '&' + $.param(extraData);
+        }
+        ajaxOptions.data = data;
+
+        // Run the ajax call
+        $.ajax(ajaxOptions);
     });
 
     /**
@@ -149,8 +182,9 @@ $(function() {
 
     /**
      * Submit (Save and/or validate) an individual field when its value changes, within the context of the larger form
+     * @todo: Combine the field and ui wrappers or trigger events on both?
+     * @todo: Use UiBlocks.ajax method instead of $.ajax
      */
-    //@todo: combine the field and ui wrappers or trigger events on both?
     $('body').on('ui-value-changed', '.ui', function(e, params) {
         e.stopPropagation();
 
@@ -248,7 +282,7 @@ $(function() {
     $('body').on('ui-value-changed', '.ui', function(e, params) {
         var $form = getFormFromField($(this));
         if($form.attr('data-track-unsaved-changes')) {
-            $(this).find('.field').addClass('field_changed');
+            $(this).find('.field').first().addClass('field_changed');
             if($form.attr('data-warn-unsaved-changes')) {
                 window.onbeforeunload = function () { return true; }; // Alert the user if they try to navigate away with unsaved changes
             }

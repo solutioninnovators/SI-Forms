@@ -1,4 +1,6 @@
 <?php namespace ProcessWire;
+#[\AllowDynamicProperties]
+
 /**
  * Class FieldUi
  * @package ProcessWire
@@ -36,19 +38,22 @@ abstract class FieldUi extends Ui {
 	public $__label = '';
 	public $__showLabel = true;
 	public $__required = false;
+	public $requiredErrorMsg = 'Required';
 	public $__description = ''; // Text that appears before field
 	public $__notes = ''; // Text that appears below field
 	public $__inputClasses = '';
-	public $__readOnly = false; // Set to true to display the value of the field while preventing modification or posting to the form
+	public $__readOnly = false; // Set to true to display the value of the field without allowing user modification. (The field may still post its data back to the form, so it is up to the developer to disregard it during save if they want to be absolutely sure the data hasn't been manipulated by a savvy user).
 	public $__autofocus = false; // Set focus to this field when the page loads
 	public $__autocomplete = false; // Turn on/off browser autocomplete functionality
 	public $__show = true; // Should the field be shown or hidden? (for field dependencies)
-	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (if field dependency logic requires fields to be defined in an order that is different from their display order)
+	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (This should no longer be necessary if you are using callbacks to set properties)
 	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper @todo: Change to fieldAttributes
 	public $cssClass = ''; // String of classes to add to the field wrapper @todo: Change to fieldClass?
 	public $__dependsOn = []; // Array containing the names of fields that this field depends on. If the value of any of these fields changes, this field will reload via ajax
 	public $resetValueOnReload = false; // If set to true, any time this field reloads as a result of a change of the value of another field specified in its $dependsOn array, the value of this field will reset to the default value, even if the user populated it with something else.
 	
+	public $nonNull = false; // A field that is nonNull is always considered populated (e.g. a checkbox)
+
 	/**
 	 * When we try to set a property that does not exist, check if there is a corresponding placeholder property with the same name that is preceded by two underscores. If the value we're setting is a callback, store it in the placeholder for execution later. If it isn't, set it to a real property right away and unset the placeholder property.
 	 *
@@ -123,6 +128,8 @@ abstract class FieldUi extends Ui {
 	/**
 	 * The validate method evaluates $this->value and returns true or false depending on whether it is a valid input for the given field. If an error is discovered, it will populate $this->error
 	 *
+	 * This should NOT be overridden by subclasses. Instead, override the fieldValidate() method.
+	 *
 	 * @return boolean
 	 */
 	public function validate() {
@@ -130,7 +137,10 @@ abstract class FieldUi extends Ui {
 		// If there is any filtering/sanitization (optional), run it before validation (security best practice)
 		$this->filter();
 		if(FormUi::isCallback($this->filterCallback)) {
-			call_user_func_array($this->filterCallback, [$this, $this->form]);
+			$return = call_user_func_array($this->filterCallback, [$this, $this->form]);
+			if($return) {
+				$this->value = $return;
+			}
 		}
 
         // If validateOverride then skip normal validation
@@ -138,10 +148,11 @@ abstract class FieldUi extends Ui {
 			// If field is not populated, check if it's required
 			if(!$this->isPopulated()) {
 				if(!$this->required) {
+					// If it's not populated and not required, we can skip further validation
 					return true;
 				}
 				else {
-					if(!$this->error) $this->error = __('Required');
+					if(!$this->error) $this->error = $this->requiredErrorMsg;
 					return false;
 				}
 			}
@@ -214,6 +225,8 @@ abstract class FieldUi extends Ui {
 	 * @param bool forceSaveNow - Specify true to override the default behavior and force the field to save changes immediately no matter what
 	 */
 	public function save($forceSaveNow = false) {
+		if($this->readOnly) return; // Skip read only fields
+
 		$savePage = null;
 		$saveNow = true;
 
@@ -282,6 +295,21 @@ abstract class FieldUi extends Ui {
 		}
 
 		$this->view->formAttribute = $this->form && !$this->form->legacyMode && $this->form->id ? 'form="'.$this->form->id.'"' : '';
+	}
+
+	public function siblings($name = null) {
+		if($this->parent && $this->parent instanceof FieldUi) {
+			if($name) {
+				$searchName = $this->parent->name;
+				if(isset($this->iteration)) $searchName .= "[$this->iteration]";
+				$searchName .= "[$name]";
+
+				return $this->form->findField($this->parent->children, $searchName);
+			}
+			else {
+				return $this->parent->children;
+			}
+		}
 	}
 
 	/**

@@ -11,11 +11,18 @@ class RepeaterFieldUi extends FieldUi {
 	public $itemTemplate; // The field object or array of field objects of type FieldUI to repeat. This should not have a value. Name is optional and will only be used for multiple templates.
 	public $value = [];
 	public $showBlankItem = true; // Show a new item right away without having to click the "add" button
+	public $showBlankItemWhenEmpty = true;
     public $itemLimit;  // The number of items allowed to be added
 	public $cssClass = 'repeaterField';
 	public $sortable = false;
     public $noRemove = false;
-	//public $showSortHandle = false;
+    public $showLabelOnce = false;
+    // determines whether to show a drag handle
+	public $showSortHandle = false; // todo: Sorting without the sort handle is currently broken
+    // if you provide a custom class here, it will be used to decide what CSS to use for the drag handle
+	public $sortHandleClass = 'repeaterField-dragHandle';
+	public $innerClasses = 'gGrid'; // CSS classes to add to the inner div wrapper inside the repeater (typically to add grid framework classes)
+	public $addNewIcon = '<i class="fa fa-fw fa-plus"></i>';
 
 	public $children = []; // The items (rows) in the repeater
 
@@ -31,56 +38,84 @@ class RepeaterFieldUi extends FieldUi {
 	 */
 	private function constructRepeaterItems() {
 		$repeaterItems = [];
-		$repeaterItemIteration = 0;
 
-		foreach($this->value as $repeaterItemValue) {
-			if(is_array($this->itemTemplate) && is_array($repeaterItemValue)) { // Array of item templates
+		// Create a hidden blank template item for javascript to use to make new items.
+		// NOTE: This item is given an index of -1. It should not post when the form is submitted. If the '-1' index is appearing in POST/GET, then that means that one of the item template fields probably does not yet support the "disabled" property. The field in question should be updated to support this property.
+		$this->constructRepeaterItem($repeaterItems, -1);
+
+		// Create one repeater item for each element in the $this->value array
+		for($i = 0; $i < count($this->value); $i++) {
+			$this->constructRepeaterItem($repeaterItems, $i, $this->value[$i]);
+		}
+
+		// Determine if we should show a blank item for new input when the page loads.
+		if(!$this->form->isSubmission()) {
+			// Always show a blank item if there are no other items and $this->showBlankItemWhenEmpty = true
+			if(count($this->value) == 0) {
+				if($this->showBlankItemWhenEmpty) {
+					$this->constructRepeaterItem($repeaterItems, count($this->value));
+				}
+			}
+			// Only show an additional blank item if $this->showBlankItem is enabled
+			elseif($this->showBlankItem) {
+				// Skip adding an additional blank item if the last one is already blank
+				$lastChild = count($this->value) > 0 ? $repeaterItems[array_key_last($repeaterItems)] : null;
+				if($lastChild && $this->childIsPopulated($lastChild)) {
+					$this->constructRepeaterItem($repeaterItems, count($this->value));
+				}
+			}
+		}
 				
-				$subfieldIteration = 0;
+		return $repeaterItems;
+	}
+
+	private function constructRepeaterItem(&$repeaterItems, $i, $repeaterItemValue = null) {
+		if(is_array($this->itemTemplate)) { // Array of item templates
 				foreach($this->itemTemplate as $subfieldTemplate) {
 					$subfield = clone $subfieldTemplate;
 					$subfieldName = $subfield->name;
-					$subfield->id = $this->id . "__{$repeaterItemIteration}__" . $subfield->id;
-					$subfield->name = $this->name . "[$repeaterItemIteration][$subfieldName]";
-					$subfield->value = $repeaterItemValue[$subfieldName];
-					$subfield->iteration = $repeaterItemIteration;
+				$subfield->id = $this->id . "__{$i}__" . $subfield->id;
+				$subfield->name = $this->name . "[$i][$subfieldName]";
+				if($i === -1) $subfield->disabled = true;
+				if($repeaterItemValue) $subfield->value = $repeaterItemValue[$subfieldName];
+				$subfield->iteration = $i;
 					$subfield->form = $this->form;
+				$subfield->parent = $this;
 					$subfield->afterValueSet();
-					$repeaterItems[$repeaterItemIteration][$subfieldName] = $subfield;
-
-					$subfieldIteration++;
+				$repeaterItems[$i][$subfieldName] = $subfield;
 				}
 			}
 			else { // Single item template
                 $subfield = clone $this->itemTemplate;
-				$subfield->id = $this->id . "__{$repeaterItemIteration}__";
-				$subfield->name = $this->name . "[$repeaterItemIteration]";
-				$subfield->value = $repeaterItemValue;
-				$subfield->iteration = $repeaterItemIteration;
+			$subfield->id = $this->id . "__{$i}__";
+			$subfield->name = $this->name . "[$i]";
+			if($i === -1) $subfield->disabled = true;
+			if($repeaterItemValue) $subfield->value = $repeaterItemValue;
+			$subfield->iteration = $i;
 				$subfield->form = $this->form;
+			$subfield->parent = $this;
 				$subfield->afterValueSet();
 				$repeaterItems[] = $subfield;
 			}
-
-			$repeaterItemIteration++;
-		}
-		return $repeaterItems;
 	}
 
 	/**
 	 * @return bool
+	 *
 	 * The calling form will have already set $this->value to the new value coming from post or get, so we just have to check the current value of $this->value
 	 */
 	public function fieldValidate() {
 		$valid = true;
 
-		if($this->itemLimit && $this->itemLimit < count($this->children)) {
+		if($this->itemLimit && $this->itemLimit < count($this->value)) {
 			$this->error = __('Max number of items is ') . $this->itemLimit;
 			$valid = false;
 		}
 
 		// Loop through each of the child fields and call its validate() function.
-		foreach($this->children as $child) {
+		foreach($this->children as $key => $child) {
+			if($key === -1) continue; // Don't validate the template item
+
 			if(is_array($child)) { // Multiple fields per row
 				foreach($child as $subfield) {
 					if(!$subfield->validate()) $valid = false;
@@ -105,33 +140,9 @@ class RepeaterFieldUi extends FieldUi {
 			$this->repeaterItemsConstructed = true;
 		}
 
-		// Prepare output
+		// Render output
 		$repeaterItemsOut = [];
-
-		// Create a hidden blank template item for javascript to use to make new items
-		// NOTE: If the '$' element is appearing in the array, that means that one of the item template fields probably does not yet support the "disabled" property, so it is getting submitted. The field in question should be fixed.
-		if(is_array($this->itemTemplate)) { // Multiple fields per row
-			$repeaterRow = '';
-			foreach($this->itemTemplate as $fieldTemplate) {
-				$newField = clone $fieldTemplate;
-                $newField->id = $this->id . '__$__' . $newField->name;
-				$newField->name = $this->name . "[$][$newField->name]";
-				$newField->disabled = true;
-				$repeaterRow .= $newField->render();
-			}
-			$repeaterItemsOut[] = $repeaterRow;
-		}
-		else { // One field per row
-			$template = clone $this->itemTemplate;
-            $template->id = $this->id . '__$__';
-			$template->name = $this->name . '[$]';
-			$template->disabled = true;
-			$repeaterItemsOut[] = $template->render();
-		}
-
-		// Render existing fields in $this->fields for the view
 		foreach ($this->children as $field) {
-			//if($field->isPopulated()) { // Filter out unpopulated fields
 				if (is_array($field)) { // Multiple fields per row
 					$repeaterRow = '';
 					foreach ($field as $subfield) {
@@ -141,39 +152,7 @@ class RepeaterFieldUi extends FieldUi {
 				} else { // One field per row
 					$repeaterItemsOut[] = $field->render();
 				}
-			//}
-		}
-
-		// Create an additional blank field for new input
-		$totalChildren = count($this->children);
-		if($this->showBlankItem || $totalChildren == 0) {
-			// Don't create an additional element if the last child is already unpopulated
-			$lastChild = $totalChildren > 0 ? $this->children[$totalChildren - 1] : null;
-			if($totalChildren < 1 || ($lastChild && $this->childIsPopulated($lastChild))) {
-
-				$newItemIndex = $totalChildren;
-
-				if (is_array($this->itemTemplate)) { // Multiple fields per row
-					$repeaterRow = '';
-					foreach ($this->itemTemplate as $fieldTemplate) {
-						$newField = clone $fieldTemplate;
-						$newField->id = $this->id . "__{$newItemIndex}__" . $newField->id;
-						$newField->name = $this->name . "[$newItemIndex][$newField->name]";
-						$newField->classes = $newField->classes .= ' repeaterField-newItem';
-						$repeaterRow .= $newField->render();
 					}
-					$repeaterItemsOut[] = $repeaterRow;
-				}
-				else { // One field per row
-					$newField = clone $this->itemTemplate;
-					$newField->id = $this->id . "__{$newItemIndex}__";
-					$newField->name = $this->name . "[$newItemIndex]";
-					$newField->classes = $newField->classes .= ' repeaterField-newItem';
-					$repeaterItemsOut[] = $newField->render();
-				}
-			}
-		}
-
 		$this->view->repeaterItemsOut = $repeaterItemsOut;
 
 		return parent::run();
@@ -198,12 +177,12 @@ class RepeaterFieldUi extends FieldUi {
 	public function childIsPopulated($child) {
 		if(is_array($child)) { // Child is an array of fields
 			foreach($child as $subfield) {
-				if($subfield instanceof FieldUi && $subfield->isPopulated())
+				if($subfield instanceof FieldUi && $subfield->isPopulated() && !$subfield->nonNull)
 					return true;
 			}
 		}
-		elseif($child instanceof FieldUi) { // Child is a single field
-			return $child->isPopulated();
+		elseif($child instanceof FieldUi && $child->isPopulated() && !$child->nonNull) { // Child is a single field
+			return true;
 		}
 		return false;
 	}

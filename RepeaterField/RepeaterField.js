@@ -1,6 +1,6 @@
 $(function() {
-    var nameRegEx = /\[(\d+|\$)\]/;
-    var idRegEx = /__(\d+|\$)__/;
+    var nameRegEx = /\[(-?\d+)\]/;
+    var idRegEx = /__(-?\d+)__/;
 
     init($('.repeaterField'));
 
@@ -13,9 +13,10 @@ $(function() {
         $fields.each(function() {
             var list = $(this).find('.repeaterField-items');
             if(parseInt(list.attr('data-sortable'))) {
-                Sortable.create(list[0], {
+                var handle = list.attr('data-sortable-handle');
+                var options = {
                     animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
-                    //handle: ".repeaterField-sort", // Restricts sort start click/touch to the specified element
+                    handle: handle, // Restricts sort start click/touch to the specified element
                     onUpdate: function (e) {
                         var $item = $(e.item); // the current dragged HTMLElement
 
@@ -24,7 +25,8 @@ $(function() {
                         $repeaterUi.trigger('ui-resorted'); // Trigger value changed event on the repeater when sort order changes
                         $repeaterUi.trigger('ui-value-changed'); // Trigger value changed event on the repeater when sort order changes
                     }
-                });
+                };
+                Sortable.create(list[0], options);
             }
         });
     }
@@ -51,12 +53,14 @@ $(function() {
 
                 // Update data-field-name attribute on the .field element
                 reindexAttributes($fieldUi.find('[data-field-name]'), 'data-field-name', i, 'name');
+
+                // Update data-depends-on attribute
+                reindexAttributes($fieldUi.find('[data-depends-on]'), 'data-depends-on', i, 'name');
             });
 
             // Update attributes on the Ui wrappers
             reindexAttributes($fieldUis, 'id', i, 'id');
             reindexAttributes($fieldUis, 'data-ui-id', i, 'id');
-            // reindexAttributes($fieldUis, 'data-ui-path', i, 'id'); // Updating the path breaks ajax calls on UIs within the newly created items because the item doesn't exist yet on the server. By not updating the path, we route all ajax calls through the template item, which should be sufficient at this time.
             reindexAttributes($fieldUis, 'class', i, 'id');
 
 			i++;
@@ -116,7 +120,7 @@ $(function() {
             var $repeaterUi = $item.closest('.ui_RepeaterField');
             $item.remove();
             updateIndexes($repeater);
-            $repeaterUi.trigger('ui-item-removed'); // Trigger value changed event on the repeater when sort order changes
+            $repeaterUi.trigger('ui-item-removed'); // Trigger item removed event on the repeater when item is deleted
             $repeaterUi.trigger('ui-value-changed'); // Trigger value changed event on the repeater when item is deleted
         }, 100);
     });

@@ -10,7 +10,8 @@
     />
 </div>
 <?php include('../Field/footer.php') ?>
-<?php if($imgPreview && $savePage->{$saveField}): ?>
+<?php if($imgPreview): ?>
+    <?php if($savePage && $savePage->{$saveField}): ?>
     <div class="imageList">
         <?php $multiple ? $d = 100 : $d = 200; ?>
         <?php if(get_class($savePage->{$saveField}) === "ProcessWire\Pageimage"): ?>
@@ -31,6 +32,16 @@
             <?php endforeach ?>
         <?php endif ?>
     </div>
+    <?php elseif (!empty($value)): ?>
+        <div class="imageList">
+            <div class="imageListItem">
+                <img class="imageListItem-preview" src="<?=$imgPreviewPath.$value?>" />
+                <button type="button" class="imageListItem-delete btn btn_sm tooltip" name="<?=$value?>" title="Delete File">
+                    <i class="fa fa-trash-can fa-fw"></i>
+                </button>
+            </div>
+        </div>
+    <?php endif ?>
 <?php else: ?>
     <div class="field-noValue"><i class="fa fa-minus-circle"></i> No Image</div>
 <?php endif ?>

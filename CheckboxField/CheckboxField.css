@@ -1,5 +1,8 @@
 .checkboxField {
-    padding-top: 1.5rem;
+    /*padding-top: 1.5rem;*/
+}
+    .checkboxField .field-input {
+        margin-right: .25em;
 }
 
 /* Toggle Switch checkbox replacement */

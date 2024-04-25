@@ -2,6 +2,7 @@
 
 <?php if($readOnly): ?>
 	<div class="field-readOnly">
+		<input <?= $formAttribute ?> type="hidden" name="<?= $sanitizer->entities1($name) ?>" value="<?= $sanitizer->entities1($value) ?>" <?= $disabled ? 'disabled' : '' ?> />
 		<?php if($value): ?>
 			<?= $sanitizer->entities1($value) ?>
 		<?php else: ?>
@@ -9,7 +10,20 @@
 		<?php endif ?>
 	</div>
 <?php else: ?>
-	<input <?= $formAttribute ?> maxlength="<?= $sanitizer->entities1($maxLength) ?>" name="<?= $sanitizer->entities1($name) ?>" <?= $attributeString ?> <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="<?= $sanitizer->entities1($type) ?>" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $this->type !== 'password' ? $sanitizer->entities1($value) : '' ?>" <?= $disabled ? 'disabled="disabled"' : '' ?> <?= $autofocus ? 'autofocus="autofocus"' : '' ?> <?= !$autocomplete ? 'autocomplete="off"' : '' ?> />
+	<input
+		<?= $formAttribute ?>
+		type="<?= $sanitizer->entities1($type) ?>"
+		maxlength="<?= $sanitizer->entities1($maxLength) ?>"
+		name="<?= $sanitizer->entities1($name) ?>"
+		<?= $id ? 'id="input_'.$sanitizer->entities1($id).'"' : '' ?>
+		class="field-input txtBox<?= $error ? ' txtBox_error' : '' ?> <?= $sanitizer->entities1($inputClasses) ?>"
+		placeholder="<?= $sanitizer->entities1($placeholder) ?>"
+		value="<?= $this->type !== 'password' ? $sanitizer->entities1($value) : '' ?>"
+		<?= $disabled ? 'disabled="disabled"' : '' ?>
+		<?= $autofocus ? 'autofocus="autofocus"' : '' ?>
+		<?= !$autocomplete ? 'autocomplete="off"' : '' ?>
+		<?= $attributeString ?>
+	/>
 <?php endif ?>
 
 <?php include('../Field/footer.php') ?>

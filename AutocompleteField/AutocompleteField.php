@@ -2,6 +2,8 @@
 
 	<?php if($readOnly): ?>
 		<div class="field-readOnly">
+			<input <?= $formAttribute ?> type="hidden" name="<?= $sanitizer->entities1($name) ?>" value="<?= $sanitizer->entities1($value) ?>" <?= $disabled ? 'disabled' : '' ?> />
+
 			<?php if($value): ?>
 				<?= $sanitizer->entities1($value) ?>
 			<?php else: ?>
@@ -10,9 +12,19 @@
 		</div>
 	<?php else: ?>
 		<div class="autocompleteField-inputs">
-			<i class="autocompleteField-spinner fa fa-spin fa-circle-o-notch hide"></i>
+			<div class="autocompleteField-spinner"><i class="fa fa-spin fa-circle-o-notch"></i></div>
 
-			<input <?= $formAttribute ?> maxlength="<?= $sanitizer->entities1($maxLength) ?>" <?php if($id): ?>id="input_<?= $sanitizer->entities1($id) ?>"<?php endif ?> class="field-input txtBox <?= $error ? 'txtBox_error' : '' ?>" type="text" placeholder="<?= $sanitizer->entities1($placeholder) ?>" value="<?= $sanitizer->entities1($displayValue) ?>" <?php if(count($settings)): ?>data-settings="<?= $sanitizer->entities1(json_encode($settings)) ?>"<?php endif ?> <?= $disabled ? 'disabled' : '' ?> />
+			<input
+				<?= $formAttribute ?>
+				maxlength="<?= $sanitizer->entities1($maxLength) ?>"
+				<?= $id ? 'id="input_'.$sanitizer->entities1($id).'"' : '' ?>
+				class="field-input txtBox<?= $error ? ' txtBox_error' : '' ?> <?= $sanitizer->entities1($inputClasses) ?>"
+				type="text"
+				placeholder="<?= $sanitizer->entities1($placeholder) ?>"
+				value="<?= $sanitizer->entities1($displayValue) ?>"
+				<?php if(count($settings)): ?>data-settings="<?= $sanitizer->entities1(json_encode($settings)) ?>"<?php endif ?>
+				<?= $disabled ? 'disabled' : '' ?>
+			/>
 
 			<input <?= $formAttribute ?> type="hidden" name="<?= $sanitizer->entities1($name) ?>" class="autocompleteField-value" value="<?= $sanitizer->entities1($value) ?>" <?= $disabled ? 'disabled' : '' ?> />
 		</div>

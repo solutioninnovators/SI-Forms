@@ -1,5 +1,7 @@
 <?php include('../Field/header.php') ?>
 
+	<input type="hidden" <?= $formAttribute ?> class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" <?= $disabled ? 'disabled' : '' ?> />
+
 	<?php if($readOnly): ?>
 
 		<ul class="userChooser">
@@ -8,6 +10,8 @@
 				if(in_array($option->id, $value)):
 			?>
 				<li class="userChooser-item userChooser-readOnly userChooser-selected">
+					<input <?= $formAttribute ?> type="hidden" name="<?= $sanitizer->entities1($name) ?>[]" value="<?= $sanitizer->entities1($option->id) ?>" <?= $disabled ? 'disabled' : '' ?> />
+
 					<img class="userChooser-img tooltip" src="<?= $option->user_img->size($thumbnailSize,$thumbnailSize)->url ?>" title="<?= $sanitizer->entities1($option->fullName()) ?>" alt="<?= $sanitizer->entities1($option->initials) ?>" />
 
 					<?php if($showInitials): ?>
@@ -21,7 +25,6 @@
 		</ul>
 
 	<?php else: ?>
-		<input type="hidden" <?= $formAttribute ?> class="field-fallback" name="<?= $sanitizer->entities1($name) ?>" value="[#]" <?= $disabled ? 'disabled' : '' ?> />
 	
 		<ul class="userChooser <?= $singular ? 'userChooser_singular' : '' ?> <?= $useDropDown ? 'userChooser_useDropDown' : '' ?>">
 			<?php if($useDropDown): ?>

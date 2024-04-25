@@ -8,10 +8,12 @@
  */
 class CheckboxFieldUi extends FieldUi {
 
-	public $value = null;
+	public $value = 0;
 	public $toggleSwitch = false;
 	public $cssClass = 'checkboxField';
 	public $showLabel = false;
+
+	public $nonNull = true; // As a boolean, a checkbox can never be unpopulated
 
 	protected function setup() {
 		if($this->columnize) $this->headScripts[] = $this->config->urls->templates . 'library/jquery.columnizer.min.js';

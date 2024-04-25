@@ -1,7 +1,7 @@
 <?php namespace ProcessWire;
 class TextFieldUi extends FieldUi {
 	public $type = 'text'; // Options include text, email, password
-	public $attributes = []; // Any additional html attributes
+	public $attributes = []; // Any additional html attributes to add to the input
 	public $maxLength = 255;
 	public $cssClass = 'textField';
 	public $honeypot = false; // Is this a honeypot field?

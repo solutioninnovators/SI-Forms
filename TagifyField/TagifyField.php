@@ -2,6 +2,7 @@
 
 	<?php if($readOnly): ?>
 		<div class="field-readOnly">
+			<input <?= $formAttribute ?> type="hidden" name="<?= $sanitizer->entities1($name) ?>" value="<?= $sanitizer->entities1($value) ?>" <?= $disabled ? 'disabled' : '' ?> />
 			<?php if($value): ?>
 				<?= $sanitizer->entities1($value) ?>
 			<?php else: ?>

@@ -25,9 +25,8 @@ class FileFieldUi extends FieldUi {
     public $cssClass = 'fileField';
 
     public function run() {
-        $this->displayValue = $this->savePage->getUnformatted($this->saveField);
-
-        return parent::run();
+        $this->displayValue = $this->getDisplayValue();
+        parent::run();
     }
 
 	public function isPopulated() {
@@ -35,6 +34,10 @@ class FileFieldUi extends FieldUi {
             return true;
         }
         return false;
+    }
+
+    protected function getDisplayValue() {
+        return ($this->savePage) ? $this->savePage->getUnformatted($this->saveField) : $this->value;
     }
 
     public function fieldValidate() {
@@ -64,7 +67,7 @@ class FileFieldUi extends FieldUi {
                     }
                 }
             } else {
-                $this->value = $this->savePage->getUnformatted($this->saveField);
+                $this->value = $this->getDisplayValue();
             }
         } else {
             $ext = strtolower(pathinfo($value['name'], PATHINFO_EXTENSION)); // Get file extension
@@ -110,7 +113,7 @@ class FileFieldUi extends FieldUi {
         } else {
             $this->addFileToField($value['name'], $value['tmp_name']);
         }
-        $this->value = $this->savePage->getUnformatted($this->saveField);
+        $this->value = $this->getDisplayValue();
     }
 
     public function addFileToField($value, $tempName) {
@@ -158,6 +161,10 @@ class FileFieldUi extends FieldUi {
     }
 
     public function ajax_removeFileFromPage($data) {
+        if(FormUi::isCallback($this->saveCallback)) {
+            $this->value = '';
+            call_user_func_array($this->saveCallback, [$this, $this->form]);
+        } else {
         $savePage = $this->savePage;
         $savePage->of(false);
         $pageFiles = $savePage->{$this->name};
@@ -168,6 +175,7 @@ class FileFieldUi extends FieldUi {
                 $savePage->of(true);
             }
         }
+    }
     }
 
     /**
@@ -182,5 +190,44 @@ class FileFieldUi extends FieldUi {
                 wireSendFile($pageFile->filename(), array('forceDownload' => true));
             }
         }
+    }
+
+    /**
+     * General purpose function to move the currently uploaded file to a new location and update the current value
+     * @param $toPath
+     * @param bool $is_upload determines whether to use $_FILES for source OR file system for source
+     * @return bool whether the move succeeded or not
+     */
+    public function moveTo($toPath, $is_upload = FALSE) {
+        $fromPath = $this->value;
+        if(empty($fromPath) OR !is_string($fromPath)) return FALSE;
+
+        // make sure all folder paths exists
+        $toDir = dirname($toPath);
+        if(!is_dir($toDir)) {
+            // IMPORTANT: Setting the recursive flag so if folders along the tree doesn't exist, it will be auto created
+            if(!mkdir($toDir, 0777, TRUE)) {
+                $error = __("Could not create the upload directory: " . $toDir);
+            }
+        }
+
+        if(is_dir($toDir)) {
+            // Remember, we can only use move_uploaded_file for uploads in the $_FILES array, for others, we have to rely on files
+            $result = $is_upload ? move_uploaded_file($fromPath, $toPath) : rename($fromPath, $toPath);
+            if ($result) {
+                // NOTE: We are updating the file, because after move, the current value won't exist
+                $this->value = $toPath;
+                return TRUE;
+            } else {
+                $error = __("Could not move uploaded file to target location: " . $toPath);
+            }
+        }
+
+        // pass errors to both logger and display to user
+        if(!empty($error)) {
+            $this->session->error = $error;
+            $this->log->error($error);
+        }
+        return FALSE;
     }
 }

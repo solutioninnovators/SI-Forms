@@ -10,6 +10,12 @@
  */
 
 class AutocompleteFieldUi extends FieldUi {
+	public $cssClass = 'autocompleteField';
+	public $settings = []; // Array of settings for configuring the jquery.autocomplete.js instance.
+	public $searchCallback; // A callback function that returns search results. Can be used in place of searchSelector if you're not working with ProcessWire Pages or need absolute control. The callback is passed three parameters: $query, $field, $form. The return value should be an array of associative arrays with a 'value' and a 'data' element for each. The 'data' element is itself an associative array with an 'id' and optional 'category'. See jquery.autocomplete documentation for more options. If using this option, you will also need to provide a $validateCallback to validate the input. Using this $searchCallback overrides most of the options below.
+	public $__displayValue; // If using $searchCallback and populating the field with an initial $value, use $displayValue to show a string different from the value in the input box. For example, showing a customer name instead of the customer id.
+
+	// The options below are only relevant if this field is returning ProcessWire Pages and you are not using $searchCallback above
 	public $searchFields = 'title'; // Pipe separated list of field names to search
 	public $searchById = true; // Show matching result in the autocomplete when a valid page ID is entered directly
 	public $__searchSelector; // A selector string to narrow down the pages that will be searched
@@ -22,9 +28,7 @@ class AutocompleteFieldUi extends FieldUi {
 	public $resultLimit = 10;
 	public $searchOperator = '%='; // ProcessWire search operator to use to match results
 	public $groupBy; // Name of ProcessWire field to group the suggestions by (if grouping the suggestions is desired)
-	public $cssClass = 'autocompleteField';
-	public $maxLength;
-	public $settings = []; // Array of settings for configuring the jquery.autocomplete.js instance.
+    public $maxLength = 255;
 
 	protected function setup() {
 		$this->headScripts[] = $this->url . 'jquery.autocomplete.js'; // This is not the same as jQueryUI Autocomplete. See https://github.com/devbridge/jQuery-Autocomplete
@@ -32,15 +36,17 @@ class AutocompleteFieldUi extends FieldUi {
 
 	protected function run() {
 		// Set the initial display value when the field loads. If the value is a valid page, format the display value (results label) according to our preferences.
-		$this->view->displayValue = $this->value;
+		$this->view->displayValue = $this->displayValue ?? $this->value;
 
-		if(ctype_digit($this->value)) {
-			$match = $this->pages->get($this->buildValidateSelector());
-			if($match->id) { // Valid Page
-				$this->view->displayValue = $this->createLabel($match);
+		if(!$this->searchCallback) {
+			if(ctype_digit($this->value)) {
+				$match = $this->pages->get($this->buildValidateSelector());
+				if($match->id) { // Valid Page
+					$this->view->displayValue = $this->createLabel($match);
+				}
 			}
 		}
-		
+
 		return parent::run();
 	}
 
@@ -66,16 +72,17 @@ class AutocompleteFieldUi extends FieldUi {
 	}
 
 	protected function fieldValidate() {
-
-		if($this->allowStringValue == false || ctype_digit($this->value)) {
-			// Make sure value is an ID that matches a valid page for this field
-			if(!$this->pages->get($this->buildValidateSelector())->id) {
-				$this->error = __('Invalid selection.');
-				$this->view->displayValue = $this->value;
+		if(!$this->searchCallback) {
+			if($this->allowStringValue == false || ctype_digit($this->value)) {
+				// Make sure value is an ID that matches a valid page for this field
+				if(!$this->pages->get($this->buildValidateSelector())->id) {
+					$this->error = __('Invalid selection.');
+					$this->view->displayValue = $this->value;
+				}
 			}
-		}
-		else {
-			$this->value = $this->sanitizer->text($this->value);
+			else {
+				$this->value = $this->sanitizer->text($this->value);
+			}
 		}
 
 		if($this->error) return false;
@@ -97,25 +104,32 @@ class AutocompleteFieldUi extends FieldUi {
 	}
 
 	/**
-	 * Returns matching results (Pages) for the autocomplete jQuery plugin
+	 * Returns matching results (e.g. Pages) for the autocomplete jQuery plugin
+	 *
+	 * Each result is an associative array with a 'value' and a 'data' element. The 'data' element is an associative array with an 'id' and optional 'category'. See jquery.autocomplete documentation for more.
 	 */
 	protected function ajax_getMatches() {
 		$query = $this->input->get->query;
 
 		if($query) {
-			$matches = $this->pages->find($this->buildSearchSelector($query));
+			if($this->searchCallback) {
+				$this->ajax['suggestions'] = call_user_func_array($this->searchCallback, [$query, $this, $this->form]);
+			}
+			else {
+				$matches = $this->pages->find($this->buildSearchSelector($query));
 
-			$this->ajax['suggestions'] = [];
-			if($matches->count()) {
-			foreach($matches as $match) {
-				$label = $this->createLabel($match);
+				$this->ajax['suggestions'] = [];
+				if($matches->count()) {
+					foreach($matches as $match) {
+						$label = $this->createLabel($match);
 
-					$suggestion = ['value' => $label, 'data' => ['id' => "$match->id"]];
-					if($this->groupBy) {
-						$suggestion['data']['category'] = $match->get("{$this->groupBy}");
+						$suggestion = ['value' => $label, 'data' => ['id' => "$match->id"]];
+						if($this->groupBy) {
+							$suggestion['data']['category'] = $match->get("{$this->groupBy}");
+						}
+
+						$this->ajax['suggestions'][] = $suggestion;
 					}
-
-					$this->ajax['suggestions'][] = $suggestion;
 				}
 			}
 		}

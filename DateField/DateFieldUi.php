@@ -1,11 +1,15 @@
 <?php namespace ProcessWire;
+/*
+ * NOTE: This field should be provided a value in the same format that it will display to the user (the same format specified in the $jsDateFormat and $phpDateFormat properties below). When saving, you must manually convert the value back to your database format.
+ */
 class DateFieldUi extends FieldUi {
 
 	public $cssClass = 'dateField';
-	public $jsDateFormat = 'YYYY/MM/DD'; // YYYY-MM-DD Doesn't seem to work with the current version of Pikaday
-	public $phpDateFormat = 'Y/m/d';
+	public $jsDateFormat = 'YYYY/MM/DD'; // Note: YYYY-MM-DD Doesn't seem to work with the current version of Pikaday
+	public $phpDateFormat = 'Y/m/d'; // The php date format must be equivalent to the js format above. These are different because JS and PHP use different character codes to represent the same formats.
 	public $maxLength;
-	public $minDate;
+//	public $minDate;
+	public $__minDate;
     public $maxDate;
 
 	public function setup() {

@@ -77,3 +77,8 @@
     .saveBadge .fa-check-circle {
         color: #93BF0D;
     }
+
+/* Hide wrappers of hidden fields */
+.ui_HiddenField {
+    display: none;
+}

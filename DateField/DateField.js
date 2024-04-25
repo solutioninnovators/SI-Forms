@@ -13,9 +13,9 @@ $(function() {
 
             var date = new Pikaday({
                 field: $input[0],
-                format: $input.attr('data-date-format'),
-                minDate: new Date($input.attr('data-min-date')),
-                maxDate: new Date($input.attr('data-max-date')),
+                format: $input.data("date-format"),
+                minDate: new Date($input.attr('data-min-date') + 'T00:00:00'),
+                maxDate: new Date($input.attr('data-max-date') + 'T00:00:00'),
             });
 
             // If the value of the field is changed, automatically trigger setDate on pikaday

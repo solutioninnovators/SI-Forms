@@ -1,5 +1,5 @@
 $(function() {
-   $('.passwordField-visibility').on('click', function() {
+   $('body').on('click', '.passwordField-visibility', function() {
        var $this = $(this);
        var $inputs = $(this).closest('.field').find('.field-input');
        var $input = $inputs.first();

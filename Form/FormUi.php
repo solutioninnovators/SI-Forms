@@ -1,15 +1,16 @@
 <?php namespace ProcessWire;
 /**
  * Class FormUi
- * @version 1.3.1
+ * @version 2.0.0
  *
  * FormUI is the base class for forms. It holds a collection of fields and the logic for looping through the collection to validate the form as a whole.
+ *
  * Call process() instead of render() on the form block to return an array of the processed and rendered header, footer, and fields instead of a single rendered view of the entire form. See the return value of the run() method for details.
  *
  * Note: HTML5 allows fields outside of a form tag to still be associated with the form. Just add the attribute form="my_form_id" to the field you create
  *
  * @todo: When setting init values, should we have an option to use the field's saveField value to populate it with the database value automatically? We could add a getDbValue and getDbValueCallback
- * @todo: Possibly create a parent class that both FormUi and FieldUi inherit from.
+ * @todo: Possibly create a parent class or interface that both FormUi and FieldUi inherit from.
  * @todo: Also add option to save individual fields that are valid (during validation) even when not all fields are valid?
  *
  */
@@ -19,6 +20,7 @@ class FormUi extends Ui {
 	public $id = 'form'; // Unique name for this form to distinguish from other UIs (also used for the form's session namespace when $sessionStorage = true)
 	public $markup = true; // Include the <form> tags and attributes in the output returned from the UI (Recommended)
 	public $formClasses = ''; // CSS classes to add to the form
+	public $innerClasses = 'gGrid'; // CSS classes to add to the inner div wrapper inside the form (typically to add grid framework classes)
 	public $method = 'post'; // post or get
 	public $action = ''; // URI the form will submit to. Leave blank for current page
 	public $target = '_self';
@@ -27,17 +29,19 @@ class FormUi extends Ui {
 	public $sessionStorage = false; // Enable automatic storage and retrieval of field values in the session
 	public $error; // Holds an error set by the form after validate() is called
 	public $ajaxSubmit = false; // Should the form be submitted via ajax? (avoids refreshing the page)
+	public $ajaxSubmitMethod = 'serialize'; // this parameter determines whether to use form.serialize or FormData for ajax submission. methods can be: serialize or formdata
 	public $noSubmit = false; // Prevent the form from submitting (Useful if all fields in the form are set to ajaxSave)
 	public $savePage; // Optional ProcessWire page to automatically save values to on a successful form submission (used for fields where $savePage is not set on the field itself)
 	public $validateCallback; // Additional validation to run after the individual fields are validated and before the success callback. Should return true|false. You may also return an error string.
-	public $successCallback; // Callback method to process the form data after successful validation
-	public $errorCallback; // Callback to run if the validation was unsuccessful
+	public $successCallback; // Callback method to process the form data after successful validation. If ajaxSubmit=true, the return value of this function will be passed back to javascript via the ui-success event.
+	public $errorCallback; // Callback to run if the validation was unsuccessful. If ajaxSubmit=true, the return value of this function will be passed back to javascript via the ui-error event.
 	public $novalidate = true; // Disable the browser's built in validation on HTML5 inputs
 	public $legacyMode = false; // Allows older implementations of SI Form (prior to the use of the successCallback and errorCallback) to function properly without having to make any changes to the implementation
 	public $sessionValuesPulled = false; // For use with $legacyMode only
 	public $alwaysProcess = false; // Should the form undergo validation/processing every time it is rendered, even if the user didn't submit it? For example, a search form that should perform the search on every page load, regardless of whether the user submitted it.
 	public $trackUnsavedChanges = false; // Adds the css class "field_changed" if a field has changed on the page.
 	public $warnUnsavedChanges = false; // Show the browser's unsaved changes warning dialog box if user tries to leave a page with unsaved changes? (requires $trackUnsavedChanges = true)
+	public $neverSkip = true;
 
 	// Regions inside the form tags that may be populated with html
 	public $beforeForm = '';
@@ -85,14 +89,14 @@ class FormUi extends Ui {
 		foreach($this->children as $field) {
 			if(!$field instanceof FieldUi) continue;
 
-			// Set the field's value attribute to the value from from post or get
-			if($field->type === 'file') {
+			// Set the field's value attribute to the value from post or get
+			if($field->type == 'file') {
 				$rawInputValue = isset($_FILES[$field->name]) ? $_FILES[$field->name] : null;
 			}
-			elseif($this->method === 'get') {
+			elseif($this->method == 'get') {
 				$rawInputValue = isset($_GET[$field->name]) ? $_GET[$field->name] : null;
 			}
-			elseif($this->method === 'post') {
+			elseif($this->method == 'post') {
 				$rawInputValue = isset($_POST[$field->name]) ? $_POST[$field->name] : null;
 			}
 
@@ -190,6 +194,8 @@ class FormUi extends Ui {
 		$name = $this->name ? "name='{$this->sanitizer->entities1($this->name)}'" : '';
 		$autocomplete = $this->sanitizer->entities1($this->autocomplete);
 		$ajaxSubmit = $this->ajaxSubmit ? 'data-ajax-submit=1' : '';
+        // this parameter determines whether to use form.serialize or FormData for ajax submission
+		$ajaxSubmitMethod = $this->ajaxSubmitMethod ? "data-ajax-submit-method='{$this->sanitizer->entities1($this->ajaxSubmitMethod)}'" : '';
 		$noSubmit = $this->noSubmit ? 'data-no-submit=1' : '';
 		$novalidate = $this->novalidate ? 'novalidate' : '';
 		$trackUnsavedChanges = $this->trackUnsavedChanges ? 'data-track-unsaved-changes=1' : '';
@@ -197,7 +203,7 @@ class FormUi extends Ui {
 		$hiddenSubmit = $this->noSubmit === false ? "<input type='hidden' name='form_{$this->sanitizer->entities1($this->id)}' value='1' />" : '';
 		$csrf = ($this->method == 'post' && !$this->disableCSRF) ? $this->session->CSRF->renderInput() : '';
 
-		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $noSubmit $novalidate $trackUnsavedChanges $warnUnsavedChanges> $hiddenSubmit $csrf";
+		return "<form id='$id' class='$formClasses' method='$method' target='$target' enctype='multipart/form-data' autocomplete='$autocomplete' $name $action $ajaxSubmit $ajaxSubmitMethod $noSubmit $novalidate $trackUnsavedChanges $warnUnsavedChanges> $hiddenSubmit $csrf";
 	}
 
 	protected function getFormFooter() {
@@ -348,7 +354,7 @@ class FormUi extends Ui {
 	 * @param string $name
 	 * @return FieldUI
 	 */
-	private function findField(array $fields, string $name) {
+	public function findField(array $fields, string $name) {
 		foreach($fields as $field) {
 			if(is_array($field)) { // Repeaters with multiple fields per row
 				foreach($field as $f) {
@@ -424,23 +430,30 @@ class FormUi extends Ui {
 	}
 
 	protected function processForm() {
+		$returnData = null;
 		if($this->validate()) {
 			// Save any fields that are configured to save automatically
 			$this->saveForm();
 
 			// If a success callback function was specified, call it now
 			if(self::isCallback($this->successCallback)) {
-				call_user_func_array($this->successCallback, [$this]);
+				$returnData = call_user_func_array($this->successCallback, [$this]);
 			}
 
-			return true;
+			return [
+				'valid' => true,
+				'returnData' => $returnData
+			];
 		}
 		else {
 			if(self::isCallback($this->errorCallback)) {
-				call_user_func_array($this->errorCallback, [$this]);
+				$returnData = call_user_func_array($this->errorCallback, [$this]);
 			}
 
-			return false;
+			return [
+				'valid' => false,
+				'returnData' => $returnData
+			];
 		}
 	}
 
@@ -484,8 +497,9 @@ class FormUi extends Ui {
 
 		$result = $this->processSubmit();
 		$allFields = $this->allFields();
+		$data['returnData'] = $result['returnData'];
 
-        if($result) {
+        if($result['valid']) {
 			$data['success'] = 1;
 		}
 		else {

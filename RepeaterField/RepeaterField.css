@@ -12,21 +12,35 @@
     }
     .repeaterField-items {
         width: 100%;
+        padding: 0;
     }
     .repeaterField-item {
         position: relative;
     }
-    .repeaterField-item_sortable {
-
-    }
     .repeaterField-field {
-        margin-right: 40px;
+        padding-right: 2rem;
+    }
+        .repeaterField-items[data-show-sort-handle="1"] .repeaterField-field {
+            padding-left: 2rem;
     }
     .repeaterField-remove {
         position: absolute;
         top: 50%;
         right: 0;
         transform: translateY(-50%);
+    }
+        .repeaterField-items[data-read-only="1"] .repeaterField-field {
+            padding-right: 0;
+        }
+    .repeaterField-dragHandle {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        padding: .25rem;
+    }
+    .repeaterField-items[data-show-label-once="1"] .repeaterField-item:not(:nth-child(2)) .field-label  {
+        display: none;
     }
 
 .grabbable, .grabbable label {

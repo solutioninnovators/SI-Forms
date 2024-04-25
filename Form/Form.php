@@ -2,7 +2,7 @@
 	<?= $formHeader ?>
 <?php endif ?>
 	<?= $beforeForm ?>
-	<div class="gGrid">
+	<div class="<?= $innerClasses ?>">
 		<?php foreach($fields as $field): ?>
 			<?= $field ?>
 		<?php endforeach ?>
