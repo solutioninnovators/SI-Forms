@@ -21,7 +21,7 @@
 				class="field-input txtBox<?= $error ? ' txtBox_error' : '' ?> <?= $sanitizer->entities1($inputClasses) ?>"
 				type="text"
 				placeholder="<?= $sanitizer->entities1($placeholder) ?>"
-				value="<?= $sanitizer->entities1($displayValue) ?>"
+				value="<?= $sanitizer->entities1($displayValueOut) ?>"
 				<?php if(count($settings)): ?>data-settings="<?= $sanitizer->entities1(json_encode($settings)) ?>"<?php endif ?>
 				<?= $disabled ? 'disabled' : '' ?>
 			/>

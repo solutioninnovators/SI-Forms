@@ -36,13 +36,13 @@ class AutocompleteFieldUi extends FieldUi {
 
 	protected function run() {
 		// Set the initial display value when the field loads. If the value is a valid page, format the display value (results label) according to our preferences.
-		$this->view->displayValue = $this->displayValue ?? $this->value;
+		$this->view->displayValueOut = $this->displayValue ?? $this->value;
 
 		if(!$this->searchCallback) {
 			if(ctype_digit($this->value)) {
 				$match = $this->pages->get($this->buildValidateSelector());
 				if($match->id) { // Valid Page
-					$this->view->displayValue = $this->createLabel($match);
+					$this->view->displayValueOut = $this->createLabel($match);
 				}
 			}
 		}
@@ -77,7 +77,7 @@ class AutocompleteFieldUi extends FieldUi {
 				// Make sure value is an ID that matches a valid page for this field
 				if(!$this->pages->get($this->buildValidateSelector())->id) {
 					$this->error = __('Invalid selection.');
-					$this->view->displayValue = $this->value;
+					$this->view->displayValueOut = $this->value;
 				}
 			}
 			else {
