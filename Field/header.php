@@ -12,7 +12,7 @@
 >
 
 	<?php if($showLabel && $label): ?>
-		<label class="field-label" <?php if($id): ?>for="input_<?= $sanitizer->entities1($id) ?><?php endif ?>">
+		<label class="field-label" <?= $labelTooltip ? 'class="tooltip" title="'.$labelTooltip.'"' : '' ?><?php if($id): ?>for="input_<?= $sanitizer->entities1($id) ?><?php endif ?>">
 			<?php if($icon): ?><i class="field-icon fa fa-fw fa-<?= $sanitizer->entities1($icon) ?>"></i><?php endif ?>
 			<?= $sanitizer->entities1($label) ?>
 			<?php if($required): ?><span class="field-required">*</span><?php endif ?>

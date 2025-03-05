@@ -36,6 +36,7 @@ abstract class FieldUi extends Ui {
 	public $saveField; // Optional ProcessWire Field name - if different from this UI's name property (used for AJAX saves)
 	public $__icon = '';
 	public $__label = '';
+    public $__labelTooltip = '';
 	public $__showLabel = true;
 	public $__required = false;
 	public $requiredErrorMsg = 'Required';
@@ -46,7 +47,7 @@ abstract class FieldUi extends Ui {
 	public $__autofocus = false; // Set focus to this field when the page loads
 	public $__autocomplete = false; // Turn on/off browser autocomplete functionality
 	public $__show = true; // Should the field be shown or hidden? (for field dependencies)
-	public $index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (This should no longer be necessary if you are using callbacks to set properties)
+	public $__index; // Optional integer index to change the order that the fields are output in. This allows fields to be processed in a different order than they are displayed in (if field dependency logic requires fields to be defined in an order that is different from their display order)
 	public $extraAttributes = []; // An associative array of additional attributes to add to the field div wrapper @todo: Change to fieldAttributes
 	public $cssClass = ''; // String of classes to add to the field wrapper @todo: Change to fieldClass?
 	public $__dependsOn = []; // Array containing the names of fields that this field depends on. If the value of any of these fields changes, this field will reload via ajax

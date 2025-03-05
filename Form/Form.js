@@ -270,8 +270,13 @@ $(function() {
             },
             error: function (xhr, textStatus, errorThrown) {
                 $saveBadge.fadeOut();
-                alert('Network error. You may have been logged out due to inactivity or a lost connection. Please reload the page and try again.');
-                console.log('Error: ' + textStatus + ' ' + errorThrown);
+                if (xhr.readyState === 0) {
+                    console.log('AJAX request aborted due to navigation. Suppressing alert.');
+                }
+                else {
+                    alert('Network error. You may have been logged out due to inactivity or a lost connection. Please reload the page and try again.');
+                    console.log('Error: ' + textStatus + ' ' + errorThrown);
+                }
             }
         });
     });
